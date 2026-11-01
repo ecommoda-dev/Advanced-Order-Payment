@@ -1,0 +1,3027 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<!-- skills: html-builder v8.6.0 · worker-builder v3.10.0 · constants v4.4.0 · order-lifecycle v1.9.0 — 01-11-2026 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل التحصيل قبل الشحن — EcomModa</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     §STYLES — كتلة التوكنز الوحيدة في أول الستايل
+     ══════════════════════════════════════════════════════════════ -->
+<style>
+/* ══════════════════════════════════════════════════════════════
+   §STYLES::root — كتلة التوكنز الوحيدة في الصفحة (design-system.md)
+   🔴 ممنوع أي علامة تعليق جوّه تعليق CSS — تعليقات CSS مابتتداخلش.
+   Tier M (1200) — أوسع تاب: سجل بتسع أعمدة. الأداة أوردر واحد في المرة.
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:             #f3f4f6;
+  --surface:        #ffffff;
+  --surface-2:      #f9fafb;
+  --border:         #e5e7eb;
+  --border-strong:  #d1d5db;
+  --text-primary:   #111827;
+  --text-secondary: #4b5563;
+  --text-muted:     #4b5563;
+  --text-mid:       #374151;
+  --accent:         #2563eb;
+  --accent-light:   #eff6ff;
+  --accent-dark:    #1d4ed8;
+  --green:          #16a34a;
+  --green-light:    #f0fdf4;
+  --green-border:   #86efac;
+  --red:            #dc2626;
+  --red-light:      #fef2f2;
+  --red-border:     #fca5a5;
+  --amber:          #d97706;
+  --amber-light:    #fffbeb;
+  --amber-border:   #fde68a;
+  --purple:         #7c3aed;
+  --purple-light:   #f5f3ff;
+  --purple-border:  #c4b5fd;
+
+  --surface-hover:       #f0f4f8;
+  --neutral-dark:        #1a1d27;
+  --on-accent:           #ffffff;
+  --accent-border:       #bfdbfe;
+  --accent-hover:        #dbeafe;
+  --accent-hover-border: #93c5fd;
+  --accent-muted:        #93c5fd;
+  --green-dark:          #15803d;
+  --red-dark:            #b91c1c;
+  --amber-dark:          #92400e;
+  --purple-dark:         #4c1d95;
+
+  --focus-ring:          rgba(37,99,235,.12);
+  --focus-ring-red:      rgba(220,38,38,.12);
+  --focus-ring-neutral:  rgba(107,114,128,.14);
+
+  --th-size: 12px; --th-weight: 700; --th-color: var(--text-mid);
+  --td-size: 12.5px; --td-weight: 600;
+
+  --radius:         12px;
+  --radius-sm:      8px;
+  --shadow:         0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+  --font-body:      'Noto Sans Arabic', -apple-system, sans-serif;
+  --font-mono:      'Noto Sans Arabic', -apple-system, sans-serif;
+  --container-max:  1200px;
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 12px;
+  direction: rtl;
+}
+.container { max-width: var(--container-max); margin: 0 auto; }
+
+/* ── Main Tabs — full width, equal split (UI Standard v2) ──── */
+.main-tabs-bar {
+  display: flex; gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.main-tab-btn {
+  flex: 1;
+  padding: 9px 10px;
+  border: 2px solid transparent;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  white-space: nowrap;
+}
+.main-tab-btn:hover  { background: var(--surface-2); color: var(--text-primary); }
+.main-tab-btn.active {
+  background: var(--accent); color: var(--on-accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(37,99,235,.25);
+}
+.tab-panel        { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Header Shell ───────────────────────────────────────────── */
+.app-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.app-title           { display: flex; align-items: center; gap: 10px; }
+.app-icon            { font-size: 22px; }
+.app-title-text h1   { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.app-title-text span { font-size: 11px; color: var(--text-muted); }
+.app-header-btns     { display: flex; align-items: center; gap: 6px; }
+
+/* ── Base Header Button ─────────────────────────────────────── */
+.hbtn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.hbtn:hover    { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.hbtn:disabled { opacity: .5; cursor: not-allowed; }
+.hbtn.settings-configured { border-color: var(--green); color: var(--green); background: var(--green-light); }
+.hbtn.ver-btn {
+  border-color: var(--accent-border); color: var(--accent-dark); background: var(--accent-light);
+  font-family: var(--font-mono); font-weight: 700;
+}
+.hbtn.ver-btn:hover { background: var(--accent-hover); border-color: var(--accent-hover-border); color: var(--accent-dark); }
+.hbtn.active-user   { border-color: var(--green); color: var(--green); background: var(--green-light); }
+.hbtn.active-user:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+.hbtn .ico { display: inline-block; }
+.hbtn.refreshing .ico { animation: hbtn-spin .7s linear infinite; }
+@keyframes hbtn-spin { to { transform: rotate(360deg); } }
+
+/* ── Update Badge (optional) ────────────────────────────────── */
+.upd-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-family: var(--font-body);
+  padding: 3px 10px; border-radius: 20px; border: 1px solid; white-space: nowrap;
+}
+.upd-badge.cached { background: var(--surface-2); border-color: var(--border); color: var(--text-secondary); }
+.upd-badge.live   { background: var(--green-light); border-color: var(--green-border); color: var(--green); }
+.upd-badge .dot   { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.upd-badge.live .dot { animation: updPulse 2s infinite; }
+@keyframes updPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── Settings Modal ─────────────────────────────────────────── */
+.settings-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.35);
+  z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.settings-overlay.open { display: flex; }
+.settings-modal {
+  background: var(--surface); border-radius: var(--radius);
+  width: 100%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+  animation: modalIn .2s ease; overflow: hidden;
+}
+@keyframes modalIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.settings-modal-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  font-size: 15px; font-weight: 700;
+}
+/* زرار الإغلاق الموحّد — إطار أحمر + خلفية حمراء — لكل النوافذ بلا استثناء */
+.modal-close-x {
+  background: var(--red-light);
+  border: 1.5px solid var(--red-border);
+  color: var(--red);
+  font-size: 14px; font-weight: 700; line-height: 1;
+  padding: 4px 11px; border-radius: var(--radius-sm);
+  font-family: inherit; cursor: pointer; transition: all .15s;
+}
+.modal-close-x:hover { background: var(--red); color: var(--on-accent); border-color: var(--red); }
+.settings-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.settings-field  { display: flex; flex-direction: column; gap: 5px; }
+.settings-label  { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; }
+.settings-input  {
+  border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 9px 11px; font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-primary); outline: none; width: 100%;
+  direction: ltr; background: var(--surface); transition: border-color .15s;
+}
+.settings-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+.settings-modal-ftr { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.btn-modal-cancel { padding: 8px 14px; background: transparent; color: var(--text-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-family: inherit; font-size: 12px; cursor: pointer; }
+.btn-modal-cancel:hover { color: var(--text-primary); }
+.btn-modal-save { padding: 8px 18px; background: var(--accent); color: var(--on-accent); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.btn-modal-save:hover { background: var(--accent-dark); }
+
+/* ── Modal Shell — About / Changelog / أي نافذة طويلة (UI Standard v2) ──
+   ① عرض = 90% من عرض الأداة   ② الهيدر ثابت فوق عند السكرول   ③ ✕ بإطار أحمر */
+.eco-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.eco-overlay.open { display: flex; }
+.eco-modal {
+  background: var(--surface); border-radius: var(--radius);
+  width: 90%;                                  /* ← 90% من عرض الأداة */
+  max-width: calc(var(--container-max) * .9);
+  max-height: 85vh;
+  display: flex; flex-direction: column;       /* ← أساس ثبات الهيدر */
+  box-shadow: 0 20px 60px rgba(0,0,0,.18); overflow: hidden;
+}
+.eco-modal-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  font-size: 14px; font-weight: 700;
+  background: var(--surface);
+  flex-shrink: 0;                              /* ← الهيدر ثابت */
+}
+.eco-modal-body { overflow-y: auto; padding: 16px 20px; flex: 1; }
+.eco-modal-ftr  { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+
+/* ── Changelog — محتوى الجسم فقط ────────────────────────────── */
+.cl-version-block { margin-bottom: 4px; }
+.cl-version-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.cl-ver-badge {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 3px 10px; border-radius: 5px;
+  background: var(--accent-light); color: var(--accent-dark); border: 1px solid var(--accent-border); direction: ltr;
+}
+.cl-ver-badge.old { background: var(--surface-2); color: var(--text-secondary); border-color: var(--border-strong); }
+.cl-ver-date { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); direction: ltr; }
+.cl-items { list-style: none; display: flex; flex-direction: column; gap: 5px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.cl-version-block:last-child .cl-items { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.cl-item { display: flex; gap: 8px; font-size: 13px; align-items: flex-start; }
+.cl-tag  { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; align-self: flex-start; margin-top: 2px; }
+.cl-tag.new    { background: var(--green-light); color: var(--green-dark); }
+.cl-tag.fix    { background: var(--red-light); color: var(--red); }
+.cl-tag.change { background: var(--amber-light); color: var(--amber-dark); }
+
+/* ── About — محتوى الجسم فقط ────────────────────────────────── */
+.about-sec { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; overflow: hidden; }
+.about-sec > summary {
+  padding: 11px 14px; font-weight: 700; font-size: 14px;
+  background: var(--surface-2); cursor: pointer; user-select: none;
+  /* ⚠️ ممنوع list-style:none — السهم الجانبي لازم يفضل ظاهر */
+}
+.about-sec-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; line-height: 1.75; }
+.about-sec-body h4 { font-size: 12px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+.about-sec-body ol,
+.about-sec-body ul { padding-inline-start: 20px; display: flex; flex-direction: column; gap: 4px; }
+.about-sec-body code {
+  font-family: var(--font-mono); font-size: 11px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 5px; direction: ltr; display: inline-block;
+}
+.about-sec-body table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.about-sec-body th,
+.about-sec-body td    { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+.about-pre {
+  font-family: var(--font-mono); font-size: 11px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  overflow-x: auto; white-space: pre; direction: ltr; text-align: left;
+  line-height: 1.65; margin: 0;
+}
+
+/* ── Toast ──────────────────────────────────────────────────── */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--on-accent); box-shadow: 0 4px 12px rgba(0,0,0,.2); animation: toastIn .3s ease; max-width: 320px; }
+@keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+.toast-success { background: var(--green); }
+.toast-error   { background: var(--red); }
+.toast-neutral { background: var(--neutral-dark); }
+/* ── Login Overlay ─────────────────────────────────────────── */
+.login-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 500;   /* login = 500 · كل الـ modals = 600 */
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.login-overlay.hidden { display: none; }
+
+/* ── Login Card ────────────────────────────────────────────── */
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 22px 70px rgba(0,0,0,.22);
+  width: 100%; max-width: 420px;
+  padding: 28px 26px 24px;
+  position: relative;
+  animation: loginIn .18s ease;
+}
+@keyframes loginIn {
+  from { transform: translateY(6px) scale(.985); opacity: 0; }
+  to   { transform: translateY(0)   scale(1);    opacity: 1; }
+}
+
+/* ── Settings Button (inside card, top-left) ───────────────── */
+.login-settings-btn {
+  position: absolute; top: 16px; left: 16px;
+  display: inline-flex; align-items: center; gap: 5px;
+  min-height: 38px; padding: 8px 12px;
+  border-radius: 9px; border: 1.5px solid;
+  background: var(--surface);
+  font-family: var(--font-body); font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.login-settings-btn.ready   { border-color: var(--green);  color: var(--green);  background: var(--green-light); }
+.login-settings-btn.missing { border-color: var(--red);    color: var(--red);    background: var(--red-light);   }
+.login-settings-btn:hover   { transform: translateY(-1px); }
+
+/* ── Version Text (below settings button, top-left) — text only, no click ── */
+.login-version {
+  position: absolute; top: 58px; left: 17px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  color: var(--text-muted); letter-spacing: .2px; user-select: none;
+}
+
+/* ── Card Top ──────────────────────────────────────────────── */
+.login-top {
+  padding-top: 12px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.login-icon  { font-size: 34px; line-height: 1; margin-bottom: 14px; }
+.login-title { font-size: 19px; font-weight: 900; letter-spacing: -.1px; }
+/* Fixed tool description — always visible, never overwritten by JS */
+.login-desc  { font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-top: 5px; }
+/* Dynamic guidance message — changes based on login state */
+.login-sub   {
+  min-height: 22px; margin-top: 4px;
+  color: var(--text-muted); font-size: 12px; font-weight: 600;
+  text-align: center; line-height: 1.7;
+}
+
+/* ── Employee Dropdown ─────────────────────────────────────── */
+.login-body  { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; }
+.login-field { display: flex; flex-direction: column; gap: 7px; }
+.login-field label {
+  display: block; font-size: 11px; font-weight: 800;
+  color: var(--text-secondary); letter-spacing: .3px;
+}
+.login-field select {
+  width: 100%; height: 58px;
+  border: 1.5px solid var(--border-strong); border-radius: 10px;
+  background: var(--surface); color: var(--text-primary);
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  outline: none; padding: 0 14px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.login-field select:focus    { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+.login-field select:disabled { opacity: .68; cursor: not-allowed; background: var(--surface-2); }
+
+/* ── Status Message (below dropdown) ──────────────────────── */
+.login-status { min-height: 18px; font-size: 12px; font-weight: 700; color: var(--text-muted); line-height: 1.5; }
+.login-status.info  { color: var(--accent); }
+.login-status.warn  { color: var(--amber);  }
+.login-status.error { color: var(--red);    }
+
+/* ── PIN Zone — الخطوة 2: مخفية لحد ما الموظف يختار اسمه ──── */
+.pin-zone { display: none; flex-direction: column; gap: 12px; animation: pinZoneIn .16s ease; }
+.pin-zone.visible { display: flex; }
+@keyframes pinZoneIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.pin-label { font-size: 12px; font-weight: 800; color: var(--text-secondary); text-align: right; margin-top: 2px; }
+
+/* ── PIN Slots ─────────────────────────────────────────────── */
+.pin-slots { display: flex; justify-content: center; gap: 9px; direction: ltr; }
+.pin-slot {
+  width: 48px; height: 48px;
+  border-radius: 10px; border: 1.5px solid var(--border-strong);
+  background: var(--surface-2);
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 22px; font-weight: 800;
+  color: var(--accent); transition: all .15s; user-select: none;
+}
+.pin-slot.empty::before  { content: '_';  transform: translateY(-2px); color: var(--accent); opacity: .75; font-size: 18px; }
+.pin-slot.filled         { background: var(--accent-light); border-color: var(--accent); }
+.pin-slot.filled::before { content: '●'; font-size: 17px; transform: translateY(-1px); color: var(--accent); opacity: 1; }
+.pin-slot.error          { border-color: var(--red); background: var(--red-light); }
+.pin-slot.error::before  { color: var(--red); }
+
+/* ── Shake animation on wrong PIN ──────────────────────────── */
+.pin-slots.shake { animation: pinShake .34s ease; }
+@keyframes pinShake {
+  0%,100% { transform: translateX(0);  }
+  22%     { transform: translateX(-5px); }
+  44%     { transform: translateX( 5px); }
+  66%     { transform: translateX(-3px); }
+  88%     { transform: translateX( 3px); }
+}
+
+/* ── PIN Keypad ────────────────────────────────────────────── */
+.pin-keypad {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 1px 0 0;
+}
+.pin-key {
+  min-height: 49px; border-radius: 10px;
+  border: 1.5px solid var(--border-strong); background: var(--surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono); font-size: 18px; font-weight: 800;
+  cursor: pointer; transition: background .12s, color .12s, border-color .12s, transform .06s;
+  display: flex; align-items: center; justify-content: center;
+}
+.pin-key:hover:not(:disabled)  { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.pin-key:active:not(:disabled) { transform: translateY(1px); }
+.pin-key.utility {
+  color: var(--red); background: var(--red-light); border-color: var(--red-border);
+  font-family: var(--font-body); font-size: 13px; font-weight: 900;
+}
+.pin-key.utility:hover:not(:disabled) { background: var(--red); color: var(--on-accent); border-color: var(--red); }
+.pin-key:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ── Alert (wrong PIN / mismatch) ──────────────────────────── */
+.login-alert {
+  display: none; min-height: 38px;
+  border-radius: 10px; border: 1px solid var(--red-border);
+  background: var(--red-light); color: var(--red);
+  padding: 9px 12px; font-size: 12px; font-weight: 800;
+  text-align: center; line-height: 1.6;
+}
+.login-alert.visible { display: block; }
+
+/* ── Primary Button (دخول / متابعة / تأكيد) ───────────────── */
+.login-primary {
+  display: none; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; min-height: 58px; margin-top: 1px;
+  border: none; border-radius: 10px;
+  background: var(--accent); color: var(--on-accent);
+  font-family: var(--font-body); font-size: 15px; font-weight: 900;
+  cursor: pointer; transition: background .15s, opacity .15s, transform .06s;
+}
+.login-primary.visible          { display: inline-flex; }
+.login-primary:hover:not(:disabled)  { background: var(--accent-dark); }
+.login-primary:active:not(:disabled) { transform: translateY(1px); }
+.login-primary:disabled { opacity: .56; cursor: not-allowed; }
+
+/* ── Secondary Button (رجوع) ───────────────────────────────── */
+.login-secondary {
+  display: none; align-items: center; justify-content: center;
+  width: 100%; min-height: 42px;
+  border-radius: 10px; border: 1px solid var(--border-strong);
+  background: var(--surface); color: var(--text-secondary);
+  font-family: var(--font-body); font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all .15s;
+}
+.login-secondary.visible { display: inline-flex; }
+.login-secondary:hover   { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+/* ── Idle logout (§IDLE-JS) — banner + login notice ────────── */
+.idle-warn {
+  display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 9000;               /* فوق كل الـ modals (600) وتحت الـ toast — rule 17 */
+  width: min(92vw, 440px);
+  background: var(--amber-light); border: 1px solid var(--amber-border); color: var(--amber-dark);
+  border-radius: 12px; padding: 12px 14px; box-shadow: 0 6px 24px rgba(0,0,0,.18);
+  text-align: center; line-height: 1.7; font-weight: 800; font-size: 13px;
+}
+.idle-warn.visible { display: block; }
+.idle-warn .idle-ask { font-weight: 900; font-size: 14px; }
+.idle-warn button {
+  margin-top: 8px; min-height: 44px; padding: 0 22px; border: none; border-radius: 10px;
+  background: var(--accent); color: var(--on-accent);
+  font-family: var(--font-body); font-size: 14px; font-weight: 900; cursor: pointer;
+}
+.login-notice {
+  display: none; border-radius: 10px; border: 1px solid var(--amber-border);
+  background: var(--amber-light); color: var(--amber-dark);
+  padding: 9px 12px; font-size: 12px; font-weight: 800; text-align: center; line-height: 1.6;
+}
+.login-notice.visible { display: block; }
+/* ── Freeze on Scroll (tabs-and-modals.md § 1b) ── */
+.sticky-header-wrap{position:sticky;top:0;z-index:300;background:var(--bg);padding-top:2px;margin:0 -2px}
+.sticky-header-wrap.stuck{box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.sticky-header-wrap.stuck .app-header{padding:6px 14px;margin-bottom:6px}
+.sticky-header-wrap.stuck .app-icon{font-size:16px}
+.sticky-header-wrap.stuck .app-title-text h1{font-size:12.5px}
+.sticky-header-wrap.stuck .app-title-text span{max-height:0;opacity:0;margin-top:0}
+.sticky-header-wrap.stuck .hbtn{padding:4px 9px;font-size:11px}
+.app-header{transition:padding .18s ease}
+.app-icon{transition:font-size .18s ease}
+.app-title-text h1{transition:font-size .18s ease}
+.app-title-text span{display:block;overflow:hidden;max-height:16px;margin-top:2px;transition:max-height .18s ease,opacity .18s ease,margin-top .18s ease}
+.main-tabs-bar{overflow:hidden;transition:max-height .22s ease,opacity .18s ease,padding .18s ease,margin .18s ease,border-width .18s ease}
+.sticky-header-wrap.stuck .main-tabs-bar{max-height:0!important;opacity:0;padding:0;margin-bottom:0;border-width:0}
+.active-tab-chip{display:none;align-items:center;gap:6px;padding:5px 10px;border:1.5px solid var(--border-strong);border-radius:20px;background:var(--surface-2);font-size:11.5px;font-weight:700;color:var(--text-primary);cursor:pointer;position:relative;white-space:nowrap;transition:border-color .15s,color .15s}
+.active-tab-chip:hover{border-color:var(--accent);color:var(--accent)}
+.active-tab-chip.open{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-light)}
+.sticky-header-wrap.stuck .active-tab-chip{display:flex}
+.chip-arrow{font-size:9px;color:var(--text-muted);transition:transform .2s}
+.active-tab-chip.open .chip-arrow{transform:rotate(180deg)}
+.tab-chip-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:310;min-width:180px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-sm);box-shadow:0 8px 28px rgba(0,0,0,.14);display:none;padding:4px}
+.tab-chip-menu.open{display:block}
+.tab-chip-item{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:12.5px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--text-secondary);white-space:nowrap}
+.tab-chip-item:hover{background:var(--surface-2)}
+.tab-chip-item.active{background:var(--accent-light);color:var(--accent-dark)}
+
+/* ── القسم الموحّد (data-table-standard.md § 1) — كارت واحد بدون overflow:hidden ── */
+.unified-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+.section-divider{border-top:1px solid var(--border)}
+.tbl-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius) var(--radius) 0 0;cursor:pointer;user-select:none;flex-wrap:wrap}
+.tbl-bar:hover{background:var(--surface-hover)}
+.tbl-bar-right,.tbl-bar-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbl-toggle{font-size:13px;color:var(--text-muted);transition:transform .25s}
+.tbl-toggle.open{transform:rotate(180deg)}
+.results-wrap{display:flex;align-items:center;gap:8px}
+.results-label{font-size:14px;font-weight:800;color:var(--text-primary);white-space:nowrap}
+.results-count{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:34px;padding:0 10px;font-family:var(--font-mono);font-size:17px;font-weight:800;color:var(--purple);background:var(--purple-light);border:1.5px solid var(--purple-border);border-radius:var(--radius-sm)}
+.upd{font-size:12px;font-weight:600;color:var(--text-mid)}
+.rb-why{font-size:12px;font-weight:700;color:var(--amber-dark)}
+.act-btn{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:var(--surface);font-family:inherit;font-size:12px;font-weight:700;color:var(--text-mid);cursor:pointer;white-space:nowrap;transition:all .15s}
+.act-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.act-btn:disabled{opacity:.5;cursor:not-allowed}
+.act-go{height:38px;padding:0 18px;font-size:13.5px;background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.act-go:hover:not(:disabled){background:var(--accent-dark);border-color:var(--accent-dark);color:var(--on-accent)}
+.act-go:disabled{background:var(--border-strong);border-color:var(--border-strong);color:var(--text-secondary);opacity:1}
+.clear-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;height:34px;border:1px solid var(--red-border);color:var(--red);background:var(--red-light);font-family:inherit}
+.clear-btn:hover{background:var(--red);color:var(--on-accent);border-color:var(--red)}
+.clear-btn.inactive{border-color:var(--border);color:var(--text-muted);background:var(--surface-2);cursor:not-allowed;opacity:.6}
+.clear-btn.inactive:hover{background:var(--surface-2);color:var(--text-muted);border-color:var(--border)}
+.rb-prog{padding:10px 16px;border-top:1px solid var(--border);font-size:12.5px;font-weight:700;color:var(--text-mid)}
+.rb-prog[hidden]{display:none}
+.rb-prog-track{height:8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;margin-top:6px}
+.rb-prog-fill{height:100%;width:0;background:var(--accent);transition:width .25s ease}
+.export-warn{margin:0;padding:10px 16px;border-top:1px solid var(--amber-border);background:var(--amber-light);color:var(--amber-dark);font-size:13px;font-weight:600;line-height:1.7}
+
+/* ── Chips (§ 6) ── */
+.chips-zone{display:flex;flex-direction:column;gap:6px}
+.chips-zone.pad{padding:10px 16px;border-top:1px solid var(--border)}
+.chips-zone:empty{display:none}
+.ms-chips-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips-label{font-size:11.5px;font-weight:700;color:var(--text-mid);white-space:nowrap}
+.ms-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-light);border:1px solid var(--accent-border);color:var(--accent-dark);border-radius:20px;padding:2px 4px 2px 10px;font-size:12px;font-weight:700}
+.ms-chip button{border:none;background:var(--accent-border);color:var(--accent-dark);width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:10px;line-height:1}
+.ms-chip button:hover{background:var(--accent);color:var(--on-accent)}
+
+/* ── الجدول (§ 7 + § 9ب) ── */
+.tbl-scroll{max-height:68vh;overflow:auto}
+.tbl-body-wrap{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:1fr;transition:grid-template-rows .3s ease}
+.tbl-body-wrap>*{min-height:0}
+.tbl-body-wrap.collapsed{grid-template-rows:0fr;overflow:hidden}
+.tbl-body-wrap.collapsed>*{overflow:hidden}
+.data-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:var(--td-size)}
+.data-table.auto{table-layout:auto}
+.data-table thead th{position:sticky;top:0;z-index:20;background:var(--surface-2);color:var(--th-color);font-weight:var(--th-weight);font-size:var(--th-size);padding:10px 6px;text-align:center;white-space:normal;box-shadow:inset 0 -2px 0 var(--border-strong)}
+.data-table tbody td{text-align:center;padding:9px 6px;border-bottom:1px solid var(--border);white-space:normal;overflow-wrap:anywhere;font-size:var(--td-size);font-weight:var(--td-weight);vertical-align:middle}
+.data-table thead th,.data-table tbody td{border-inline-start:1px solid var(--border)}
+.data-table thead th:first-child,.data-table tbody td:first-child{border-inline-start:none}
+.data-table tbody tr:hover{background:var(--surface-2)}
+.data-table tbody tr.flash{animation:rbFlash 1.3s ease}
+@keyframes rbFlash{0%,60%{background:var(--amber-light)}100%{background:transparent}}
+.col-num{font-family:var(--font-mono);direction:ltr;white-space:nowrap}
+.th-in{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;max-width:100%}
+.th-label{cursor:pointer;user-select:none;padding:2px 4px;border-radius:5px;transition:background .12s,color .12s}
+.th-label:hover,th.sorted .th-label{background:var(--accent-light);color:var(--accent-dark)}
+.sort-icon{display:inline-block;font-size:10px;color:var(--accent);font-weight:900}
+.sort-icon.active{margin-inline-start:4px}
+.th-flt{min-width:22px;height:22px;padding:0 3px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:800}
+.th-flt svg{width:14px;height:14px}
+.th-flt:hover{background:var(--accent-light);color:var(--accent)}
+th.flt-on .th-flt{background:var(--accent-light);border-color:var(--accent-border);color:var(--accent)}
+.rb-cb{width:17px;height:17px;cursor:pointer;accent-color:var(--accent)}
+.rb-cb:disabled{cursor:not-allowed;opacity:.45}
+.rb-ordercell{white-space:nowrap}
+.rb-x{margin-inline-start:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-muted);border-radius:6px;width:20px;height:20px;font-size:10px;line-height:1;cursor:pointer;vertical-align:middle}
+.rb-x:hover:not(:disabled){background:var(--red);border-color:var(--red);color:var(--on-accent)}
+.rb-x:disabled{opacity:.4;cursor:not-allowed}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.status-badge.ok{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green-border)}
+.status-badge.warn{background:var(--amber-light);color:var(--amber-dark);border:1px solid var(--amber-border)}
+.status-badge.err{background:var(--red-light);color:var(--red-dark);border:1px solid var(--red-border)}
+.status-badge.neutral{background:var(--surface-2);color:var(--text-mid);border:1px solid var(--border-strong)}
+.sub{font-size:11px;font-weight:600;color:var(--text-mid);margin-top:2px}
+.rb-reasons{margin:0;padding:0;list-style:none;text-align:right;font-size:12px;font-weight:600;line-height:1.7}
+.rb-reasons li{display:flex;flex-wrap:wrap;gap:2px 6px;align-items:baseline}
+.rb-reasons li+li{margin-top:2px}
+.rb-reasons .lb{color:var(--text-mid)}
+.rb-reasons .ch{font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate}
+.rb-reasons .bad{color:var(--red-dark)}
+.rb-reasons .warnx{color:var(--amber-dark)}
+.rb-retry{margin-top:4px;border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent-dark);border-radius:6px;font-size:11.5px;font-weight:700;padding:2px 10px;cursor:pointer;font-family:inherit}
+.empty{padding:40px;text-align:center;color:var(--text-mid);font-weight:700}
+.pagination-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-top:1px solid var(--border)}
+.pagination-row[hidden]{display:none}
+.page-info{font-size:13px;color:var(--text-secondary);font-family:var(--font-mono);padding:0 8px}
+.page-btn{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);color:var(--text-primary);transition:background .15s,border-color .15s}
+.page-btn:hover:not(:disabled){background:var(--accent-light);border-color:var(--accent-border);color:var(--accent)}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── القوايم العائمة — position:fixed على body (§ 2.2) ── */
+.pop{position:fixed;z-index:200;width:268px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-sm);box-shadow:0 8px 24px rgba(0,0,0,.16);max-height:72vh;display:flex;flex-direction:column}
+.pop.wide{width:340px}
+.pop-hd{padding:9px 12px;font-weight:800;font-size:12.5px;border-bottom:1px solid var(--border);background:var(--surface-2);border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.pop-body{padding:10px 12px;display:flex;flex-direction:column;gap:9px}
+.pop-srch{padding:8px 10px 0}
+.ms-ftr-top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border)}
+.lnk{border:none;background:none;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent);font-family:inherit}
+.lnk:hover{text-decoration:underline}
+.ms-list{overflow:auto;padding:4px}
+.ms-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;user-select:none}
+.ms-item:hover{background:var(--surface-hover)}
+.ms-item .cb{width:16px;height:16px;border:1.5px solid var(--border-strong);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--on-accent);flex-shrink:0}
+.ms-item.on .cb{background:var(--accent);border-color:var(--accent)}
+.ms-item.on .cb::after{content:'✓'}
+.ms-cnt{margin-inline-start:auto;font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-mid);background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:0 7px}
+.inp{width:100%;height:36px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);padding:0 11px;font-size:13px;font-weight:600;font-family:inherit;color:var(--text-primary);background:var(--surface);outline:none;transition:border-color .15s,background .15s}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.inp.has-value{border-color:var(--accent);background:var(--accent-light)}
+.search-wrap{position:relative}
+.search-wrap .inp{padding-left:34px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-muted);pointer-events:none}
+.rng{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rng>div{min-width:0}
+.pop-body label{font-size:11.5px;font-weight:700;color:var(--text-mid);display:block;margin-bottom:3px}
+.inp[type=date]{min-width:0;padding:0 8px;font-size:12.5px}
+.preset-list{display:flex;flex-direction:column;gap:2px}
+.preset-list button:not(.clear-btn){text-align:right;padding:7px 9px;border:none;background:none;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--text-primary);font-family:inherit}
+.preset-list button:not(.clear-btn):hover{background:var(--surface-hover)}
+.preset-list button.on:not(.clear-btn){background:var(--accent-light);color:var(--accent-dark);font-weight:800}
+.pop .clear-btn{height:30px;padding:4px 10px;font-size:12px}
+.pop .pop-body>.clear-btn{align-self:flex-start}
+.pop .preset-list>.clear-btn{margin:6px 8px;align-self:flex-start}
+.tip{position:fixed;z-index:210;max-width:300px;background:var(--neutral-dark);color:var(--on-accent);font-size:12px;font-weight:600;line-height:1.7;padding:6px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.2);pointer-events:none;word-break:break-word}
+
+/* ── عرض الأعمدة بالسحب (§ 9ب) ── */
+.data-table.measuring th,.data-table.measuring td{white-space:nowrap}
+.data-table.measuring .th-in{flex-wrap:nowrap;max-width:none}
+.col-rz{position:absolute;top:0;bottom:0;inset-inline-end:0;width:10px;cursor:col-resize;touch-action:none;z-index:3}
+.col-rz::after{content:'';position:absolute;top:24%;bottom:24%;inset-inline-end:3px;width:2px;border-radius:2px;background:var(--border-strong);transition:background .12s,top .12s,bottom .12s}
+.col-rz:hover::after,.col-rz.active::after{background:var(--accent);top:8%;bottom:8%}
+body.col-resizing,body.col-resizing *{cursor:col-resize!important;user-select:none!important}
+col.hl{background:var(--accent-light)}
+.w-badge{position:fixed;z-index:220;bottom:14px;left:50%;transform:translateX(-50%);background:var(--neutral-dark);color:var(--on-accent);font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:20px;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+
+.scan-input-wrap { display: flex; gap: 8px; }
+.scan-input { flex: 1; width: 100%; padding: 12px 14px; border: 2px solid var(--accent); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 16px; background: var(--surface); color: var(--text-primary); outline: none; transition: box-shadow .15s, border-color .15s; }
+.scan-input:focus { box-shadow: 0 0 0 3px var(--focus-ring); }
+.scan-input:disabled { background: var(--surface-2); color: var(--text-secondary); }
+.entry-bar { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px 16px; margin-bottom: 16px; transition: border-color .15s; }
+.entry-bar[data-view=manual] { border-top-color: var(--border-strong); }
+.entry-bar .scan-input { padding-block: 0; min-height: 52px; border-color: var(--accent); }
+.entry-bar[data-view=manual] .scan-input { border-color: var(--border-strong); }
+.entry-bar[data-view=manual] .scan-input:focus { box-shadow: 0 0 0 3px var(--focus-ring-neutral); }
+.entry-bar .scan-input-wrap .btn-primary { background: var(--accent); border-color: var(--accent); min-width: 96px; font-size: 15px; }
+.entry-bar[data-view=manual] .scan-input-wrap .btn-primary { background: var(--text-secondary); border-color: var(--text-secondary); }
+.entry-bar .scan-input-wrap .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+.entry-chips { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.entry-segs { display: inline-flex; flex-wrap: wrap; gap: 1px; max-width: 100%; background: var(--border-strong); border: 1.5px solid var(--border-strong); border-radius: 10px; overflow: hidden; }
+.entry-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 0; border-radius: 0; background: var(--surface); color: var(--text-secondary); font-family: var(--font-body); font-size: 14px; font-weight: 800; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
+.entry-chip:hover { background: var(--surface-2); }
+.entry-chip:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.entry-chip[data-m=shopify].is-on { background: var(--accent); color: var(--on-accent); }
+.entry-chip[data-m=manual].is-on { background: var(--text-secondary); color: var(--on-accent); }
+.entry-hint { display: inline-flex; align-items: center; gap: 7px; padding: 3px 14px; border-radius: 20px; border: 1.5px solid; margin-inline-start: auto; font-size: 13px; font-weight: 800; pointer-events: none; user-select: none; }
+.entry-hint svg { width: 20px; height: 20px; flex-shrink: 0; }
+.entry-hint[data-m=shopify] { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+.entry-hint[data-m=manual] { background: var(--surface-2); border-color: var(--text-secondary); color: var(--text-mid); }
+.entry-chip-auto { padding: 0 7px; line-height: 17px; border-radius: 20px; font-size: 10px; font-weight: 800; background: var(--on-accent); color: var(--accent); }
+.entry-chip[data-m=manual] .entry-chip-auto { color: var(--text-secondary); }
+
+/* ── الصندوق الأحمر: الفشل والتحذير (سطر قصير لكل حاجة + ✕) ── */
+.bc-fails { margin-bottom: 16px; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--red-light); border: 1px solid var(--red-border); color: var(--red-dark); font-size: 12.5px; font-weight: 700; line-height: 1.8; }
+.bc-fails[hidden] { display: none; }
+.bc-fail-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bc-fail-row + .bc-fail-row { margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--red-border); }
+.bc-fail-lbl { font-family: var(--font-mono); font-weight: 800; direction: ltr; }
+.bc-fail-why { flex: 1; min-width: 140px; }
+.bc-fail-x { margin-inline-start: auto; border: none; background: transparent; cursor: pointer; font-size: 15px; font-weight: 900; color: inherit; line-height: 1; padding: 2px 6px; border-radius: 6px; opacity: .7; }
+.bc-fail-x:hover { opacity: 1; background: var(--red-border); }
+.bc-fails-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   §STYLES::components — أزرار · كروت · تابات (بنفس قيم core.css المعتمدة)
+   ══════════════════════════════════════════════════════════════ */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 12px; font-size: 15px; }
+.q-empty { padding: 40px; text-align: center; color: var(--text-mid); font-weight: 700; }
+
+.btn-ghost { padding: 9px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-primary); font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.btn-ghost:hover { background: var(--bg); }
+.btn-primary { padding: 9px 18px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: var(--on-accent); font-family: var(--font-body); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary:disabled { background: var(--accent-muted); cursor: not-allowed; }
+.btn-green { padding: 9px 18px; border-radius: var(--radius-sm); border: none; background: var(--green); color: var(--on-accent); font-family: var(--font-body); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; }
+.btn-green:hover { background: var(--green-dark); }
+.btn-green:disabled { opacity: .5; cursor: not-allowed; }
+.btn-red { padding: 9px 18px; border-radius: var(--radius-sm); border: none; background: var(--red); color: var(--on-accent); font-family: var(--font-body); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; }
+.btn-red:hover { background: var(--red-dark); }
+.btn-outline { padding: 8px 14px; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-primary); border-radius: var(--radius-sm); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+.order-link { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent); text-decoration: none; direction: ltr; display: inline-block; }
+.order-link:hover { text-decoration: underline; color: var(--accent-dark); }
+.order-num { font-family: var(--font-mono); font-size: 14px; font-weight: 700; direction: ltr; display: inline-block; }
+
+/* ══ §STYLES::order — كارت الأوردر المعروض ══ */
+.oc-hdr { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.oc-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px; font-weight: 800; }
+.oc-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-mid); white-space: nowrap; }
+.pill.ok   { background: var(--green-light); border-color: var(--green-border); color: var(--green-dark); }
+.pill.bad  { background: var(--red-light);   border-color: var(--red-border);   color: var(--red-dark); }
+.pill.warn { background: var(--amber-light); border-color: var(--amber-border); color: var(--amber-dark); }
+.pill .k { color: var(--text-secondary); font-weight: 600; }
+.pill .v { font-family: var(--font-mono); direction: ltr; unicode-bidi: isolate; }
+
+.oc-banner { padding: 11px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; margin-bottom: 14px; border: 1px solid; line-height: 1.8; }
+.oc-banner.ok      { background: var(--green-light); color: var(--green-dark); border-color: var(--green-border); }
+.oc-banner.bad     { background: var(--red-light);   color: var(--red-dark);   border-color: var(--red-border); }
+.oc-banner.neutral { background: var(--surface-2);   color: var(--text-mid);   border-color: var(--border-strong); }
+.oc-banner.warn    { background: var(--amber-light); color: var(--amber-dark); border-color: var(--amber-border); }
+.oc-banner ul { margin: 6px 0 0; padding: 0; list-style: none; }
+.oc-banner li { padding: 3px 0; }
+.oc-banner li + li { border-top: 1px dashed var(--red-border); }
+
+.oc-amounts { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; min-width: 0; }
+.stat .l { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
+.stat .n { font-family: var(--font-mono); direction: ltr; text-align: right; font-size: 18px; font-weight: 800; margin-top: 2px; }
+.stat.due { background: var(--accent-light); border-color: var(--accent-border); }
+.stat.due .n { font-size: 26px; color: var(--accent-dark); }
+.stat.due.zero { background: var(--surface-2); border-color: var(--border); }
+.stat.due.zero .n { color: var(--text-mid); }
+
+.oc-items { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+.oc-items th { text-align: right; font-size: var(--th-size); font-weight: var(--th-weight); color: var(--th-color); padding: 7px 8px; border-bottom: 2px solid var(--border-strong); background: var(--surface-2); }
+.oc-items td { font-size: var(--td-size); font-weight: var(--td-weight); padding: 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.oc-items .num { font-family: var(--font-mono); direction: ltr; text-align: right; white-space: nowrap; }
+.oc-items .sku { font-family: var(--font-mono); direction: ltr; text-align: right; color: var(--text-secondary); }
+
+/* ══ §STYLES::pay — طرق الدفع وزرار التسجيل ══ */
+.pay-sec { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+.pay-sec h3 { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.pm-field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-mid); margin-bottom: 4px; }
+.pm-field input { width: 100%; height: 46px; border: 2px solid var(--border-strong); border-radius: var(--radius-sm); padding: 0 12px; font-family: var(--font-mono); font-size: 17px; font-weight: 700; direction: ltr; text-align: right; background: var(--surface); color: var(--text-primary); outline: none; transition: border-color .15s, background .15s, box-shadow .15s; }
+.pm-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
+.pm-field input.has-value { border-color: var(--accent); background: var(--accent-light); }
+.pm-field input:disabled { background: var(--surface-2); color: var(--text-secondary); cursor: not-allowed; }
+.pay-validation { margin-top: 12px; padding: 9px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-mid); }
+.pay-validation.ok { background: var(--green-light); border-color: var(--green-border); color: var(--green-dark); }
+.pay-validation.mismatch { background: var(--amber-light); border-color: var(--amber-border); color: var(--amber-dark); }
+.pay-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.pay-go { height: 46px; padding: 0 26px; font-size: 15px; }
+.pay-why { font-size: 12.5px; font-weight: 700; color: var(--amber-dark); }
+.pay-done { margin-top: 16px; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-mid); }
+.card.flash { animation: cardFlash 1s ease; }
+@keyframes cardFlash { 0%, 60% { background: var(--amber-light); } 100% { background: var(--surface); } }
+
+/* ══ §STYLES::dialogs — نوافذ التأكيد والملخّص (الـ shell مالوش نافذة تأكيد) ══ */
+.confirm-lines { text-align: right; margin: 10px 0; padding: 0; list-style: none; }
+.confirm-lines li { padding: 7px 11px; border-radius: 7px; background: var(--surface-2); margin-bottom: 6px; font-size: 13px; line-height: 1.8; }
+.confirm-lines li.soft { color: var(--text-secondary); }
+.confirm-lines li.warn { background: var(--amber-light); color: var(--amber-dark); font-weight: 700; }
+.confirm-lines li.bad  { background: var(--red-light);   color: var(--red-dark);   font-weight: 700; }
+.confirm-lines li.good { background: var(--green-light); color: var(--green-dark); font-weight: 700; }
+.confirm-lines .mono { font-family: var(--font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800; }
+.confirm-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-start; }
+.sum-badge { display: block; font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+.sum-badge.success { color: var(--green-dark); }
+.sum-badge.warning { color: var(--amber-dark); }
+.sum-badge.error, .sum-badge.rejected { color: var(--red-dark); }
+.sum-badge.already { color: var(--text-mid); }
+
+/* ══ §STYLES::filters — توكنز · تواريخ بأقسام · نطاق الأرقام (data-table-standard § 5) ══ */
+.sec { display: flex; flex-direction: column; gap: 5px; }
+.pop-body > .sec + .sec { border-top: 1px solid var(--border); padding-top: 8px; }
+.pills { display: grid; gap: 5px; }
+.pills.c3 { grid-template-columns: repeat(3, 1fr); }
+.pills.c4 { grid-template-columns: repeat(4, 1fr); }
+.pills.c6 { grid-template-columns: repeat(6, 1fr); }
+.pills button { min-height: 28px; min-width: 0; padding: 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; font-size: 12px; line-height: 1.25; font-weight: 600; cursor: pointer; color: var(--text-primary); font-family: inherit; transition: background .12s, border-color .12s; }
+.pills.c4 button { font-size: 11.5px; }
+.pills button:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.pills button.on { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent-dark); font-weight: 800; }
+.yr-step { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.yr-step button { width: 24px; height: 22px; border: 1px solid var(--border); background: var(--surface); border-radius: 5px; cursor: pointer; color: var(--text-mid); font-size: 14px; line-height: 1; font-weight: 800; font-family: inherit; }
+.yr-step button:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--border-strong); }
+.yr-step button:disabled { opacity: .35; cursor: not-allowed; }
+.yr-step .yr-lbl { width: auto; min-width: 68px; padding: 0 10px; font-family: var(--font-mono); font-size: 12.5px; font-weight: 800; color: var(--text-primary); }
+.yr-step .yr-lbl.on { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent-dark); }
+.pop-hd.has-act { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pop-body { overflow: auto; }
+.tok-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tok-row:empty { display: none; }
+.hint { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); line-height: 1.7; }
+.sec-t { font-size: 11px; font-weight: 800; color: var(--text-mid); }
+.num-warn { font-size: 11.5px; font-weight: 700; color: var(--red-dark); min-height: 16px; }
+
+/* ══ §STYLES::log — تفاصيل صفوف السجل ══ */
+.pm-cell { display: flex; flex-direction: column; gap: 2px; align-items: center; font-size: 11.5px; font-weight: 700; }
+.pm-cell .m { white-space: nowrap; }
+.pm-cell .m b { font-family: var(--font-mono); direction: ltr; unicode-bidi: isolate; }
+.note-cell { text-align: right; line-height: 1.7; }
+.note-cell .sub2 { display: block; color: var(--text-secondary); font-size: 11px; }
+
+@media (max-width: 760px) {
+  .oc-amounts { grid-template-columns: 1fr 1fr; }
+  .pm-grid { grid-template-columns: 1fr; }
+  .pay-go { width: 100%; }
+}
+
+/* ══ §STYLES::responsive — الهيدر بيلفّ على الموبايل (٥ أزرار مكانهم مش بيكفوا في ٤٠٠px) ══ */
+.app-header { flex-wrap: wrap; gap: 8px 12px; }
+.app-header-btns { flex-wrap: wrap; }
+@media (max-width: 760px) {
+  .app-header-btns { width: 100%; }
+}
+
+
+/* ── التوست: الأربعة الرسميين + dup + الأسماء البديلة (Standards #41) ── */
+.toast-warning { background: var(--amber); }
+.toast-warn    { background: var(--amber); }
+.toast-info    { background: var(--accent); }
+.toast-dup     { background: var(--amber); }
+.toast .ti { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-inline-end: 8px; border-radius: 50%; background: rgba(255,255,255,.25); font-size: 12px; font-weight: 900; }
+.scan-input-wrap .btn-primary { align-self: stretch; }
+
+</style>
+
+<!-- ══════════════════════════════════════════════════════════════
+     §SHELL — الهيدر + شريط التابات (Freeze on Scroll · tabs-and-modals.md § 1b)
+     ⚠️ <div class="container"> لازم يلف كل المحتوى — المتغيّر لوحده مالوش أي تأثير
+     ══════════════════════════════════════════════════════════════ -->
+<div class="container">
+
+  <div class="sticky-header-wrap" id="stickyWrap">
+    <div class="app-header">
+      <div class="app-title">
+        <div class="app-icon">💵</div>
+        <div class="app-title-text">
+          <h1>تسجيل التحصيل قبل الشحن</h1>
+          <span>أوردر واحد في المرة · S1 = Confirmed · S2 فاضي</span>
+        </div>
+      </div>
+      <div class="app-header-btns">
+        <!-- chip التاب الحالي — بيظهر بس لما الهيدر يتقفل (Freeze on Scroll) -->
+        <div class="active-tab-chip" id="activeTabChip" onclick="toggleTabChipMenu(event)">
+          <span id="activeTabChipLabel">💵 تسجيل التحصيل</span><span class="chip-arrow">▾</span>
+          <div class="tab-chip-menu" id="tabChipMenu"></div>
+        </div>
+        <button class="hbtn active-user" id="activeUserBtn" onclick="doLogout()">👤 —</button>
+        <button class="hbtn" id="aboutBtn" onclick="openAbout()">ℹ️ عن الأداة</button>
+        <button class="hbtn ver-btn" id="verBtn" onclick="openChangelog()"></button>
+        <button class="hbtn warn" id="verStaleBtn" style="display:none;border-color:var(--amber);color:var(--amber);background:var(--amber-light);" onclick="showWorkerStale()">⚠️ الـ Worker نسخة قديمة</button>
+        <button class="hbtn" id="settingsBtn" onclick="openSettings()">⚙️ الإعدادات</button>
+      </div>
+    </div>
+    <div class="main-tabs-bar" id="mainTabsBar">
+      <button class="main-tab-btn active" id="tabMain" onclick="switchMainTab('main')">💵 تسجيل التحصيل</button>
+      <button class="main-tab-btn" id="tabLog" onclick="switchMainTab('log')">📜 سجل العمليات</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ §TOOL — تاب تسجيل التحصيل ══════════════ -->
+  <div class="tab-panel active" id="panelMain">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+      <symbol id="ico-scan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(-.4 -1.2) scale(.8)"><path d="M5.5 5.6 15.6 4.6Q16.6 4.5 16.3 5.5L14.3 11.3Q14.1 12 13.4 12H5.5A2.5 2.5 0 0 1 3 9.5V8.1A2.5 2.5 0 0 1 5.5 5.6Z"/><path d="M12.9 4.8 11.3 12"/><path d="M7 12 5.3 19.1Q5.1 20 6 20H9.2Q10 20 9.6 19.3L8.5 17.6 10.3 12"/></g><path d="M15.6 4.4Q16.7 5.6 15.6 6.8M17.9 3Q19.9 5.6 17.9 8.2" stroke-width="1.5"/><path d="M13.8 15.6v-2h2M20.2 13.6h2v2M22.2 19.6v2h-2M15.8 21.6h-2v-2" stroke-width="1.6"/><path d="M16 16.6v3M17.9 16.6v3M19.8 16.6v3" stroke-width="1.4"/></symbol>
+      <symbol id="ico-kbd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01" stroke-width="2.4"/><path d="M9.5 14.2h5"/></symbol>
+    </defs></svg>
+
+    <!-- §ENTRY-BAR — مربع إدخال موحّد: الأداة بتعرف النوع من الطول، والبحث بـ Enter أو «بحث» بس -->
+    <div class="entry-bar" id="entryBar" data-view="manual">
+      <div class="entry-chips" id="entryChips" role="group" aria-label="مصدر الإدخال">
+        <div class="entry-segs">
+          <button type="button" class="entry-chip" data-m="shopify" aria-pressed="false">🔫 فاتورة شوبيفاي</button>
+          <button type="button" class="entry-chip is-on" data-m="manual" aria-pressed="true">⌨️ رقم الأوردر</button>
+        </div>
+        <span class="entry-hint" id="entryHint" data-m="manual" aria-hidden="true"></span>
+      </div>
+      <div class="scan-input-wrap">
+        <input type="text" class="scan-input" id="scanInput" dir="auto" inputmode="numeric" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="مربع البحث عن الأوردر" autofocus>
+        <button type="button" class="btn-primary" id="addBtn">بحث</button>
+      </div>
+    </div>
+
+    <div class="bc-fails" id="opFails" hidden></div>
+
+    <div id="orderCard" style="display:none;"></div>
+  </div>
+
+  <!-- ══════════════ §LOG — تاب سجل العمليات (server-side بالكامل) ══════════════ -->
+  <div class="tab-panel" id="panelLog">
+    <div class="unified-section">
+      <div class="tbl-bar" id="logBar">
+        <div class="tbl-bar-right">
+          <span class="tbl-toggle open" id="tog-log">▲</span>
+          <div class="results-wrap"><span class="results-label">النتائج:</span><span class="results-count" id="cnt-log">—</span></div>
+          <span class="upd" id="logUpd"></span>
+        </div>
+        <div class="tbl-bar-left">
+          <button class="act-btn" id="logReload" type="button">↺ تحديث</button>
+          <button class="act-btn" id="logExport" type="button">⬇ تصدير XLSX</button>
+          <button class="clear-btn inactive" id="logClearAll" type="button">✕ مسح كل الفلاتر</button>
+        </div>
+      </div>
+      <div class="chips-zone pad" id="chips-log"></div>
+      <div class="export-warn" id="logExportWarn" hidden></div>
+      <div class="tbl-body-wrap" id="wrap-log"><div><div class="tbl-scroll">
+        <table class="data-table auto measuring" id="tbl-log"><colgroup id="cg-log"></colgroup><thead id="th-log"></thead><tbody id="tb-log"></tbody></table>
+      </div></div></div>
+      <div class="pagination-row" id="paginationRow" hidden>
+        <button class="page-btn" id="btnPrevPage" type="button">→ السابق</button>
+        <span class="page-info" id="pageInfo"></span>
+        <button class="page-btn" id="btnNextPage" type="button">التالي ←</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Settings Modal — WORKER SECRET وبس (الرابط ثابت في §CONFIG — Standards #28) -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOnBackdrop(event)">
+  <div class="settings-modal">
+    <div class="settings-modal-hdr">
+      ⚙️ الإعدادات
+      <button class="modal-close-x" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-modal-body">
+      <div class="settings-field">
+        <label class="settings-label" for="cfgSecret">WORKER SECRET</label>
+        <input type="password" class="settings-input" id="cfgSecret" autocomplete="off" />
+      </div>
+      <div class="settings-field" style="border-top:1.5px solid var(--border);padding-top:12px;">
+        <label class="settings-label">فحص النظام</label>
+        <button class="btn-outline" id="diagBtn" onclick="runDiag()">🩺 افحص الأداة والاتصالات</button>
+        <div id="diagResult" style="margin-top:10px;font-size:12px;line-height:1.7;"></div>
+      </div>
+    </div>
+    <div class="settings-modal-ftr">
+      <button class="btn-modal-cancel" onclick="closeSettings()">إلغاء</button>
+      <button class="btn-modal-save" onclick="saveSettings()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Changelog Modal — shell موحّد: 90% عرض + هيدر ثابت + ✕ بإطار أحمر -->
+<div class="eco-overlay" id="changelogOverlay" onclick="if(event.target===this)closeChangelog()">
+  <div class="eco-modal">
+    <div class="eco-modal-hdr">
+      <span>📋 سجل التحديثات</span>
+      <button class="modal-close-x" onclick="closeChangelog()">✕</button>
+    </div>
+    <div class="eco-modal-body">
+      <div class="cl-version-block">
+        <div class="cl-version-row">
+          <span class="cl-ver-badge" id="clLatestVerBadge"></span>
+          <span class="cl-ver-date">01-11-2026</span>
+        </div>
+        <ul class="cl-items">
+          <li class="cl-item"><span class="cl-tag new">جديد</span><span>إطلاق الأداة: تسجيل تحصيل أوردر واحد قبل الشحن على شوبيفاي (تحصيل كامل · كاش / إنستاباي / محفظة)</span></li>
+          <li class="cl-item"><span class="cl-tag new">جديد</span><span>الأهلية بتتحسب في الـ Worker: S1 = Confirmed و S2 فاضي بس — وبتتعاد على قراءة جديدة وقت التسجيل</span></li>
+          <li class="cl-item"><span class="cl-tag new">جديد</span><span>تحقق بعد التسجيل بقراءة من شوبيفاي، ونتيجة بأربع حالات (تم · تم جزئيًا · فشل · متعمل خلاص)</span></li>
+          <li class="cl-item"><span class="cl-tag new">جديد</span><span>تاب سجل العمليات: فلاتر في رأس العمود + ترتيب + صفحات + تصدير XLSX</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About Modal — شل موحّد، قسمين (وصف + تشريح الكود) -->
+<div class="eco-overlay" id="aboutOverlay" onclick="if(event.target===this)closeAbout()">
+  <div class="eco-modal">
+    <div class="eco-modal-hdr">
+      <span>ℹ️ About — تسجيل التحصيل قبل الشحن</span>
+      <button class="modal-close-x" onclick="closeAbout()">✕</button>
+    </div>
+    <div class="eco-modal-body">
+
+      <details class="about-sec" open>
+        <summary>📋 وصف الأداة</summary>
+        <div class="about-sec-body">
+          <p><strong>الهدف:</strong> تسجيل تحصيل فلوس أوردر على شوبيفاي <strong>قبل ما يتشحن</strong>، أوردر واحد في المرة، مع تسجيل طرق الدفع (كاش · إنستاباي · محفظة) في سجل العمليات.</p>
+          <p><strong>المستخدمون المستهدفون:</strong> حسابات · مخزن.</p>
+
+          <h4>اللي بتقبله الأداة وبترفضه</h4>
+          <table>
+            <tr><th>الشرط</th><th>القاعدة</th></tr>
+            <tr><td>حالة الدورة الأولى S1</td><td><code>Confirmed</code> بالظبط — أي قيمة تانية = رفض بسببها</td></tr>
+            <tr><td>حالة S2 (استبدال / مرتجع)</td><td><strong>فاضية</strong> — أي قيمة = رفض (الأداة لأوردرات الدورة الأولى S1 بس)</td></tr>
+            <tr><td>الأوردر الملغي</td><td>مرفوض</td></tr>
+            <tr><td>المستحق على شوبيفاي</td><td>لازم أكبر من صفر. صفر = «متعمل خلاص» (مدفوع)، وسالب = مستحق له استرداد = مرفوض</td></tr>
+            <tr><td>المبلغ</td><td>تحصيل <strong>كامل</strong> بس — لازم يساوي المستحق الحالي بالقرش (مفيش تحصيل جزئي)</td></tr>
+            <tr><td>الاسترداد</td><td><strong>مش موجود في الأداة دي</strong> لا في الواجهة ولا في الـ Worker</td></tr>
+          </table>
+
+          <h4>كيف تعمل — Workflow</h4>
+          <ol>
+            <li>اكتب رقم الأوردر (١–٧ أرقام) أو اسكن باركود فاتورة شوبيفاي (Order ID ١٣–١٥ رقم) واضغط Enter.</li>
+            <li>الأداة بتجيب الأوردر وتعرض حالته (S1 · S2 · المالية) والمستحق، ومعاها <strong>كل أسباب الرفض</strong> لو مش مؤهل.</li>
+            <li>لو مؤهل: وزّع المبلغ على طرق الدفع — المجموع لازم يساوي المستحق.</li>
+            <li>اضغط «تسجيل التحصيل» ← نافذة تأكيد بالأرقام ← التسجيل على شوبيفاي.</li>
+            <li>الـ Worker بيعيد فحص الأهلية والمبلغ على قراءة جديدة، بيسجّل، وبعدين بيقرا الأوردر تاني <strong>ويتأكد</strong> إن المتبقي بقى صفر.</li>
+            <li>نافذة ملخّص بالنتيجة. الأوردر اللي اتسجّل بيتقفل — مفيش تسجيل تاني عليه.</li>
+          </ol>
+
+          <h4>الـ Endpoints</h4>
+          <table>
+            <tr><th>action</th><th>الوصف</th></tr>
+            <tr><td><code>lookup_order</code> (GET)</td><td>بحث بالرقم أو الـ ID + الأهلية. قراءة بس — صفر كتابة</td></tr>
+            <tr><td><code>record_payment</code> (POST)</td><td>الكتابة الوحيدة على شوبيفاي: transaction من نوع capture بـ gateway manual</td></tr>
+            <tr><td><code>get_logs</code> · <code>get_logs_count</code> · <code>get_logs_export</code></td><td>تاب السجل — فلترة وترتيب وصفحات من الـ Worker</td></tr>
+            <tr><td><code>check_employee</code> · <code>register_pin</code> · <code>verify_employee</code> · <code>log_logout</code> · <code>get_employees</code></td><td>الدخول والخروج</td></tr>
+            <tr><td><code>get_config</code> · <code>diag</code></td><td>نسخة الـ Worker · فحص ذاتي بلا كتابة</td></tr>
+          </table>
+
+          <h4>النتيجة — أربع حالات</h4>
+          <table>
+            <tr><th>الحالة</th><th>معناها</th></tr>
+            <tr><td>✓ تم</td><td>اتسجّل على شوبيفاي <strong>واتأكدنا</strong> بقراءة بعده</td></tr>
+            <tr><td>⚠ تم جزئيًا</td><td>فيه حاجة ما اتأكدتش (القراءة بعد التسجيل فشلت · الرد انقطع) — راجع الأوردر على شوبيفاي <strong>قبل أي إعادة محاولة</strong></td></tr>
+            <tr><td>✗ فشل</td><td>شوبيفاي رفضت صراحةً — السبب معروض</td></tr>
+            <tr><td>ℹ متعمل خلاص</td><td>الأوردر مدفوع أصلًا / اتسجّل عليه من أقل من دقيقتين — مش فشل</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details class="about-sec">
+        <summary>🔧 تشريح الكود</summary>
+        <div class="about-sec-body">
+          <h4>FEATURE MAP</h4>
+          <ul>
+            <li><code>§CONFIG</code> — ثوابت الأداة · <code>esc()</code> · توقيت القاهرة بـ Intl</li>
+            <li><code>§SHELL-JS</code> — الإعدادات · النسخة · حارس نسخة الـ Worker · التوست · الصوت · <code>apiRequest</code> بمهلة ٩٠ ث</li>
+            <li><code>§AUTH-JS</code> + <code>§IDLE-JS</code> — دخول بـ PIN على خطوتين · خروج تلقائي بعد ٦٠ دقيقة (واقف أثناء التسجيل)</li>
+            <li><code>§ENTRY</code> · <code>§ENTRY-BAR</code> · <code>§FAILS</code> — مربع الإدخال الموحّد (التعرّف بالطول، الفشل في صندوق أحمر)</li>
+            <li><code>§ORDER</code> — البحث وعرض الكارت والأهلية</li>
+            <li><code>§PAY</code> — طرق الدفع · التحقق · التأكيد · القفل · الملخّص</li>
+            <li><code>§TBL</code> + <code>§LOG-JS</code> — جدول السجل (فلاتر رأس العمود · عرض الأعمدة بالسحب · server-side)</li>
+            <li><code>§TABS</code> — التابات وFreeze on Scroll</li>
+          </ul>
+          <h4>KEY VARIABLES</h4>
+          <ul>
+            <li><code>currentEmployee</code> — في الذاكرة فقط (مش localStorage)</li>
+            <li><code>LS_SECRET = 'advanced_order_payment_worker_secret'</code> — السر الوحيد في localStorage، وجنبه عروض أعمدة الجدول</li>
+            <li><code>WORKER_URL</code> — ثابت في §CONFIG (الرابط مش سر)</li>
+            <li><code>MIN_WORKER_VERSION</code> — أقل Worker الواجهة بتشتغل معاه</li>
+            <li><code>isUpdating</code> — طول ما التسجيل شغّال: الإدخال مقفول والخروج (اليدوي والتلقائي) موقوف</li>
+            <li><code>sessionDone</code> — أوردرات اتسجّلت في الجلسة دي (تكرار = توست أصفر من غير بحث)</li>
+          </ul>
+          <h4>NOTES</h4>
+          <ul>
+            <li>الأهلية والمبلغ بيتحسبوا في الـ Worker. الواجهة بترسم ردّه وتقفل الزرار، لكنها <strong>مش</strong> الحارس.</li>
+            <li>انقطاع الاتصال أو مهلة بعد ضغط «تسجيل» = <strong>«ما اتأكدناش»</strong> مش «فشل»: الأداة بتعيد قراءة الأوردر لوحدها، وإنت تراجع تاب السجل قبل ما تعيد.</li>
+            <li>صفوف السجل: <code>payment</code> (اتبعت لشوبيفاي) · <code>rejected</code> (اتوقف قبل أي محاولة). مجاميع المبالغ لازم تفلتر على النتيجة «تم».</li>
+            <li>فلتر التاريخ بيقارن بيوم القاهرة (مش UTC). الفلاتر كلها server-side.</li>
+          </ul>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ §CONFIRM — تأكيد قبل أي فعل مالوش رجعة (Step 3C) ══════════════ -->
+<div class="eco-overlay" id="confirmOverlay">
+  <div class="eco-modal" style="max-width:540px;">
+    <div class="eco-modal-hdr"><span id="confirmHdr">⚠️ تأكيد</span><button class="modal-close-x" onclick="closeConfirm(false)">✕</button></div>
+    <div class="eco-modal-body">
+      <p id="confirmLead"></p>
+      <ul class="confirm-lines" id="confirmLines"></ul>
+      <div class="confirm-actions">
+        <button class="btn-ghost" id="confirmCancelBtn" onclick="closeConfirm(false)">إلغاء</button>
+        <button class="btn-red" id="confirmOkBtn" onclick="closeConfirm(true)"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ §SUMMARY — ملخّص إجباري بعد أي تسجيل (Step 3C) ══════════════ -->
+<div class="eco-overlay" id="summaryOverlay">
+  <div class="eco-modal" style="max-width:580px;">
+    <div class="eco-modal-hdr"><span>🧾 ملخّص التسجيل</span><button class="modal-close-x" onclick="closeSummary()">✕</button></div>
+    <div class="eco-modal-body">
+      <span class="sum-badge" id="sumBadge"></span>
+      <ul class="confirm-lines" id="summaryLines"></ul>
+      <div class="confirm-actions"><button class="btn-primary" id="summaryOkBtn" onclick="closeSummary()">تمام</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+</div><!-- /.container -->
+
+<!-- ══════════════ §LOGIN — شاشة الدخول (22_login-screen.html) ══════════════ -->
+<!-- Idle warning banner — §IDLE-JS (z-index 9000). النص بيتملا من JS. -->
+<div class="idle-warn" id="idleWarn" role="alert">
+  <div id="idleWarnText"></div>
+  <div class="idle-ask" id="idleWarnAsk"></div>
+  <button type="button" onclick="idleStay()">أنا موجود</button>
+</div>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+
+    <!-- Settings button — always visible before login, red=missing / green=ready -->
+    <button class="login-settings-btn missing" id="loginSettingsBtn" onclick="openSettings()">
+      ⚙️ الإعدادات
+    </button>
+
+    <!-- Version text — text only, no click. Filled by renderVersionUI() (§SHELL-JS) from TOOL_VERSION. -->
+    <div class="login-version" id="loginVersionText"></div>
+
+    <!-- Icon + Title + Fixed description + Dynamic guidance -->
+    <div class="login-top">
+      <div class="login-icon">💵</div>
+      <div class="login-title">تسجيل التحصيل قبل الشحن</div>
+      <div class="login-desc">تسجيل تحصيل أوردر واحد على شوبيفاي قبل الشحن</div>
+      <div class="login-sub" id="loginSub"></div><!-- dynamic — JS controls this. Empty in 'employee' mode by design (01-09-2026): the guidance text now lives only in the dropdown placeholder — see Standards Changelog #34 -->
+    </div>
+
+    <div class="login-body">
+
+      <!-- Employee dropdown — no <label> above it (01-09-2026): the placeholder option carries the guidance instead -->
+      <div class="login-field">
+        <select id="loginSelect" onchange="handleEmployeeChange()" disabled>
+          <option value="">اختر اسمك للمتابعة</option>
+        </select>
+        <div class="login-status warn" id="loginStatus">الإعدادات غير مكتملة — افتح الإعدادات أولاً.</div>
+      </div>
+
+      <!-- Alert — MUST stay OUTSIDE .pin-zone (visible in step 1 too) -->
+      <div class="login-notice" id="loginNotice"></div>
+      <div class="login-alert" id="loginAlert"></div>
+
+      <!-- PIN zone — STEP 2: hidden until an employee is selected -->
+      <div class="pin-zone" id="pinZone">
+        <div class="pin-label" id="pinLabel">أدخل الـ PIN</div>
+
+        <!-- 4 PIN slots -->
+        <div class="pin-slots" id="pinSlots">
+          <div class="pin-slot empty" id="pinSlot0"></div>
+          <div class="pin-slot empty" id="pinSlot1"></div>
+          <div class="pin-slot empty" id="pinSlot2"></div>
+          <div class="pin-slot empty" id="pinSlot3"></div>
+        </div>
+
+        <!-- Keypad -->
+        <div class="pin-keypad" id="pinKeypad">
+          <button class="pin-key" onclick="pressPinKey('1')">1</button>
+          <button class="pin-key" onclick="pressPinKey('2')">2</button>
+          <button class="pin-key" onclick="pressPinKey('3')">3</button>
+          <button class="pin-key" onclick="pressPinKey('4')">4</button>
+          <button class="pin-key" onclick="pressPinKey('5')">5</button>
+          <button class="pin-key" onclick="pressPinKey('6')">6</button>
+          <button class="pin-key" onclick="pressPinKey('7')">7</button>
+          <button class="pin-key" onclick="pressPinKey('8')">8</button>
+          <button class="pin-key" onclick="pressPinKey('9')">9</button>
+          <button class="pin-key utility" onclick="pressPinKey('clear')">مسح</button>
+          <button class="pin-key" onclick="pressPinKey('0')">0</button>
+          <button class="pin-key utility" onclick="pressPinKey('back')">←</button>
+        </div>
+
+        <!-- Primary action button — text changes per loginMode -->
+        <button class="login-primary visible" id="loginPrimaryBtn"
+                onclick="handlePrimaryLoginAction()" disabled>دخول</button>
+
+        <!-- Back button — visible only in confirm mode -->
+        <button class="login-secondary" id="loginSecondaryBtn"
+                onclick="restartNewPinFlow()">الرجوع لإدخال PIN جديد</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// §CONFIG — ثوابت الأداة (الرابط مش سر: الحماية في WORKER_SECRET + CORS — Standards #28)
+// ══════════════════════════════════════════════════════════════
+const TOOL_VERSION       = 'v1.0.0';   // مصدر النسخة الوحيد — الهيدر وسجل التحديثات وشاشة الدخول بيتملوا منه
+const MIN_WORKER_VERSION = '1.0.0';    // أقل Worker الواجهة دي بتشتغل معاه (lookup_order · record_payment · orders/amount في السجل)
+                                       // مالوش علاقة بـ TOOL_VERSION. ارفعه في نفس التسليم لو الصفحة اعتمدت على حقل/endpoint جديد.
+const WORKER_URL         = 'https://advanced-order-payment-worker.ecommoda-dev.workers.dev';   // CLAUDE.md بتاع الريبو
+const LS_SECRET          = 'advanced_order_payment_worker_secret';
+const SHOP_DOMAIN        = '6c7e1a-53.myshopify.com';
+
+const CFG = {
+  // مربع الإدخال الموحّد — الأطوال مقاسة (unified-entry-box.md § ٢-أ). نوعين بس: الأداة بتشتغل على أوردر واحد.
+  ORDER_NAME: { min: 1,  max: 7  },     // رقم الأوردر (#62403)
+  ORDER_ID:   { min: 13, max: 15 },     // باركود فاتورة شوبيفاي (Order ID)
+  DIGITS_WARN_MIN: 8,                   // تحذير «مفيش Enter» من ٨ أرقام
+  MISSING_ENTER_MS: 1500,               // تحذير بس — عمره ما بيبحث لوحده
+  LOG_PAGE: 100,
+  API_TIMEOUT_MS: 90000,                // طويلة عن قصد: قطع نداء كتابة في نصّه أسوأ من الانتظار
+  TOAST_MS: { success: 2200, dup: 3200, neutral: 3200, warning: 6500, error: 6500 },
+};
+
+// طرق الدفع — نفس المفاتيح المخزّنة في D1 (extra.paymentMethods) والـ Worker بيرفض غيرها
+const PM = [
+  { k: 'cash',     l: 'كاش' },
+  { k: 'instapay', l: 'إنستاباي' },
+  { k: 'wallet',   l: 'محفظة' },
+];
+
+// localStorage ممكن يرمي (وضع خاص / كوكيز محجوبة) — كل قراءة وكتابة جوّه try/catch
+function lsGet(k)    { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+
+function getConfig() {
+  return { workerUrl: WORKER_URL.replace(/\/$/, ''), workerSecret: lsGet(LS_SECRET) || '' };
+}
+function isConfigured() { return getConfig().workerSecret.length > 0; }
+
+// ─── §CONFIG::esc — إلزامي قبل أي قيمة خارجية تدخل innerHTML (title="" كمان) ───
+function esc(v) {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ─── رقم الأوردر = هايبر لينك لشوبيفاي (design-system.md) — الاسم بيتهرّب والـ ID بيتنضّف لأرقام ───
+function shopifyOrderUrl(orderId) {
+  const id = String(orderId ?? '').split('/').pop().replace(/\D/g, '');
+  return id ? `https://${SHOP_DOMAIN}/admin/orders/${id}` : '';
+}
+function orderLink(orderNumber, orderId) {
+  const label = String(orderNumber ?? '').startsWith('#') ? String(orderNumber) : `#${orderNumber ?? ''}`;
+  const url = shopifyOrderUrl(orderId);
+  if (!url) return `<span class="order-num">${esc(label)}</span>`;   // مفيش ID رقمي → من غير لينك (ممنوع تخمين)
+  return `<a href="${esc(url)}" target="_blank" rel="noopener" class="order-link">${esc(label)}</a>`;
+}
+
+// ─── §CONFIG::time — توقيت القاهرة يتحسب مايتكتبش ثابت (constants §13 — نفس دوال الـ Worker) ───
+// 🔴 حارس Invalid Date إلزامي: formatToParts بترمي RangeError، وصف واحد بتاريخ باظ كان
+//    كفاية يوقّع رسم الجدول كله. null و'' بيترفضوا صراحةً (new Date(null) = 1970 صالح!).
+const CAIRO_TZ = 'Africa/Cairo';
+const _cairoFmt = new Intl.DateTimeFormat('en-CA', {
+  timeZone: CAIRO_TZ, hourCycle: 'h23',
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit',
+});
+function cairoParts(dateLike) {
+  if (dateLike === null || dateLike === undefined || dateLike === '') return null;
+  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
+  if (isNaN(d.getTime())) return null;
+  try {
+    const o = {};
+    for (const p of _cairoFmt.formatToParts(d)) if (p.type !== 'literal') o[p.type] = p.value;
+    if (o.hour === '24') o.hour = '00';
+    return o;
+  } catch { return null; }
+}
+function _ampm(p) {
+  let h = Number(p.hour);
+  const s = h >= 12 ? 'مساءً' : 'صباحاً';
+  h = h % 12 || 12;
+  return `${String(h).padStart(2, '0')}:${p.minute} ${s}`;
+}
+function cairoDayStr(dateLike) { const p = cairoParts(dateLike); return p ? `${p.year}-${p.month}-${p.day}` : null; }
+function formatDate(iso)          { const p = cairoParts(iso); return p ? `📅 ${p.day}/${p.month}/${p.year}` : '—'; }
+function formatTimeOnly(iso)      { const p = cairoParts(iso); return p ? `🕐 ${_ampm(p)}` : '—'; }
+function formatDateForExport(iso) { const p = cairoParts(iso); return p ? `${p.day}-${p.month}-${p.year}` : ''; }
+function formatTimeForExport(iso) { const p = cairoParts(iso); return p ? _ampm(p) : ''; }
+function addDays(dayStr, n) {
+  const [y, m, d] = dayStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+}
+
+// ─── أرقام وفلوس ───
+// الفلوس بالقروش (أعداد صحيحة) في كل مقارنة — مفيش === على كسور عشرية
+const toCents = (v) => Math.round(Number(v) * 100);
+function fmtMoney(v) {
+  const n = Number(v);
+  if (!isFinite(n)) return '—';
+  const whole = Math.round(n * 100) % 100 === 0;
+  return n.toLocaleString('en-US', { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 });
+}
+const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩', FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+const toWestern = (s) => String(s ?? '').replace(/[٠-٩]/g, d => AR_DIGITS.indexOf(d)).replace(/[۰-۹]/g, d => FA_DIGITS.indexOf(d));
+// 🔴 extra تالف في صف واحد كان بيوقّع تاب السجل كله — JSON.parse دايمًا جوّه try/catch
+function safeExtra(raw) {
+  if (raw && typeof raw === 'object') return raw;
+  try { const x = JSON.parse(raw || '{}'); return x && typeof x === 'object' ? x : {}; } catch { return {}; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// §SHELL-JS — الإعدادات · النسخة · About · التوست · الصوت · نداءات الـ API
+// ══════════════════════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('cfgSecret').value = getConfig().workerSecret;
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings()            { document.getElementById('settingsOverlay').classList.remove('open'); }
+function closeSettingsOnBackdrop(e) { if (e.target === e.currentTarget) closeSettings(); }
+
+function saveSettings() {
+  const secret = document.getElementById('cfgSecret').value.trim();
+  if (!secret) { showToast('الرجاء إدخال الـ Secret', 'error'); return; }
+  if (!lsSet(LS_SECRET, secret)) { showToast('المتصفح رفض حفظ الإعدادات (وضع خاص؟) — الأداة مش هتشتغل', 'error', 7000); return; }
+  updateSettingsBtn();
+  updateLoginSettingsBtn();
+  closeSettings();
+  showToast('تم حفظ الإعدادات ✓', 'success');
+  checkWorkerVersion();
+  loadEmployeesList();
+}
+function updateSettingsBtn() {
+  document.getElementById('settingsBtn').classList.toggle('settings-configured', isConfigured());
+}
+
+// مصدر النسخة الوحيد: TOOL_VERSION — بيملا زرار الهيدر وbadge سجل التحديثات ونص شاشة الدخول
+function renderVersionUI() {
+  const verBtn = document.getElementById('verBtn');
+  if (verBtn) verBtn.textContent = `${TOOL_VERSION} 📋`;
+  const clBadge = document.getElementById('clLatestVerBadge');
+  if (clBadge) clBadge.textContent = TOOL_VERSION;
+  const loginVer = document.getElementById('loginVersionText');
+  if (loginVer) loginVer.textContent = TOOL_VERSION;
+}
+function openChangelog()  { document.getElementById('changelogOverlay').classList.add('open'); }
+function closeChangelog() { document.getElementById('changelogOverlay').classList.remove('open'); }
+function openAbout()      { document.getElementById('aboutOverlay').classList.add('open'); }
+function closeAbout()     { document.getElementById('aboutOverlay').classList.remove('open'); }
+
+// ─── التوست: success · error · warning · neutral (الأربعة الرسميين) + dup (مربع الإدخال) ───
+const TOAST_ICON = { success: '✓', error: '✗', dup: '↻', warning: '⚠', neutral: '' };
+function showToast(msg, type = 'neutral', ms) {
+  const box = document.getElementById('toastContainer');
+  if (!box) return;
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  if (TOAST_ICON[type]) { const i = document.createElement('span'); i.className = 'ti'; i.textContent = TOAST_ICON[type]; t.appendChild(i); }
+  t.appendChild(document.createTextNode(msg));       // textContent مش innerHTML للرسالة
+  box.appendChild(t);
+  setTimeout(() => t.remove(), ms || CFG.TOAST_MS[type] || 3200);
+}
+
+// ─── الصوت: success · error · warn + fail · dup (unified-entry-box.md § ٦) — مفيش أصوات منطوقة ───
+let _audioCtx = null;
+function playBeep(type) {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _audioCtx;
+    if (type === 'dup') {                                // مكرر: Mi5 ← Do5 ← La4 ← Fa4 (مربّعة نازلة)
+      const t0 = ctx.currentTime;
+      [659.3, 523.3, 440, 349.2].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter(), t = t0 + i * 0.1;
+        o.type = 'square'; o.frequency.value = f;
+        lp.type = 'lowpass'; lp.Q.value = 0.7;
+        lp.frequency.setValueAtTime(3000, t); lp.frequency.exponentialRampToValueAtTime(2000, t + 0.11);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.19, t + 0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+        o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + 0.115);
+      });
+      return;
+    }
+    const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+    o.connect(g); g.connect(ctx.destination);
+    if (type === 'fail') {                               // تحذير + فشل: بيب مربّع نازل ٦٠٠←٤٥٠Hz
+      o.type = 'square';
+      o.frequency.setValueAtTime(600, t); o.frequency.setValueAtTime(450, t + 0.12);
+      g.gain.setValueAtTime(0.23, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o.start(t); o.stop(t + 0.28);
+    } else if (type === 'success') {
+      o.frequency.setValueAtTime(880, t); o.frequency.setValueAtTime(1100, t + 0.1);
+      g.gain.setValueAtTime(0.3, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+      o.start(t); o.stop(t + 0.25);
+    } else if (type === 'warn') {
+      o.frequency.setValueAtTime(660, t); o.frequency.setValueAtTime(520, t + 0.12);
+      g.gain.setValueAtTime(0.32, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      o.start(t); o.stop(t + 0.3);
+    } else {                                             // error وأي قيمة تانية
+      o.frequency.setValueAtTime(300, t); o.frequency.setValueAtTime(200, t + 0.15);
+      g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      o.start(t); o.stop(t + 0.35);
+    }
+  } catch {}
+}
+
+// ─── نداءات الـ Worker ───
+// apiRequest بتفرّق 3 حالات كانت بتدّي نفس الرسالة الغامضة:
+//   ① الـ Worker رد بخطأ (err.status)  ② ما وصلناش له أصلًا / انقطع / مهلة (err.noResponse)  ③ رد مش JSON
+// 🔴 err.noResponse على نداء كتابة معناه «معرفناش» مش «فشل» — الـ Worker ممكن يكون نفّذ.
+async function apiRequest(url, opts) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), CFG.API_TIMEOUT_MS);
+  let resp, text;
+  try {
+    resp = await fetch(url, { ...opts, signal: ctrl.signal });
+    text = await resp.text();
+  } catch (e) {
+    const err = new Error(e.name === 'AbortError'
+      ? `الـ Worker ما ردّش خلال ${CFG.API_TIMEOUT_MS / 1000} ثانية — راجع تاب السجل قبل ما تعيد المحاولة: ممكن تكون العملية تمّت`
+      : `تعذّر الوصول للـ Worker (شبكة أو CORS) — ${e.message}`);
+    err.noResponse = true;
+    throw err;
+  } finally { clearTimeout(timer); }
+  let data;
+  try { data = JSON.parse(text); }
+  catch { const err = new Error(`رد غير متوقع من الـ Worker (HTTP ${resp.status}): ${text.slice(0, 160)}`); err.status = resp.status; throw err; }
+  if (!resp.ok) {
+    const err = new Error(resp.status === 401 ? 'السر غير صحيح — راجع الإعدادات (Unauthorized)' : (data.error || `HTTP ${resp.status}`));
+    err.status = resp.status; err.data = data; throw err;
+  }
+  return data;
+}
+async function apiPost(action, body = {}) {
+  if (!isConfigured()) { openSettings(); throw new Error('الإعدادات غير مكتملة'); }
+  const { workerUrl, workerSecret } = getConfig();
+  return apiRequest(`${workerUrl}?action=${encodeURIComponent(action)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${workerSecret}` },
+    body: JSON.stringify(body),
+  });
+}
+async function apiGet(action, params = {}) {
+  if (!isConfigured()) { openSettings(); throw new Error('الإعدادات غير مكتملة'); }
+  const { workerUrl, workerSecret } = getConfig();
+  const qs = new URLSearchParams({ action, ...params });
+  return apiRequest(`${workerUrl}?${qs}`, { headers: { 'Authorization': `Bearer ${workerSecret}` } });
+}
+
+// ─── حارس نسخة الـ Worker — حد أدنى مش تطابق (Standards #29) ───
+let workerVersion = null;
+function cmpVersion(a, b) {
+  const pa = String(a).replace(/^v/, '').split('.').map(Number);
+  const pb = String(b).replace(/^v/, '').split('.').map(Number);
+  for (let i = 0; i < 3; i++) { const d = (pa[i] || 0) - (pb[i] || 0); if (d) return d; }
+  return 0;
+}
+async function checkWorkerVersion() {
+  if (!isConfigured()) return;     // 🔴 من غيره مودال الإعدادات بيفتح لوحده فوق شاشة الدخول على أي جهاز جديد (بند ٢٩)
+  try {
+    const d = await apiGet('get_config');
+    workerVersion = d.version || null;
+    const stale = workerVersion && cmpVersion(workerVersion, MIN_WORKER_VERSION) < 0;
+    const btn = document.getElementById('verStaleBtn');
+    if (btn) btn.style.display = stale ? '' : 'none';
+  } catch { /* السر ممكن يكون غلط — الدخول هيقولك */ }
+}
+function showWorkerStale() {
+  showToast(`الـ Worker نسخته ${workerVersion} والواجهة محتاجة ${MIN_WORKER_VERSION} على الأقل — التحديث على ما يبدو ما نزلش. راجع Deployments و Promote في كلاودفلير.`, 'error', 7000);
+}
+
+// ─── 🩺 فحص النظام — أسماء وأطوال بس، ممنوع قيمة أي سر ───
+function diagRows(checks) {
+  if (!checks) return [];
+  if (Array.isArray(checks)) return checks.map(c => ({ icon: c.ok ? '✅' : '❌', label: c.label || c.name || '', detail: c.detail || '' }));
+  return Object.entries(checks).map(([k, v]) => {   // شكل الكائن (أدوات قديمة): ℹ️ معلومة مش نجاح
+    const txt = (v && typeof v === 'object') ? JSON.stringify(v) : String(v);
+    let icon = 'ℹ️';
+    if (/(Error|Warning)$/.test(k)) icon = '⚠️'; else if (/^FAILED/i.test(txt)) icon = '❌'; else if (txt === 'ok' || v === true) icon = '✅'; else if (v === false) icon = '❌';
+    return { icon, label: k, detail: txt };
+  });
+}
+async function runDiag() {
+  const btn = document.getElementById('diagBtn'), out = document.getElementById('diagResult');
+  if (!isConfigured()) { out.textContent = 'احفظ السر الأول.'; return; }
+  btn.disabled = true; out.textContent = 'جاري الفحص...';
+  try {
+    const d = await apiGet('diag');
+    out.innerHTML = `<div style="font-weight:700;margin-bottom:4px;">Worker ${esc(d.version || '—')}</div>` +
+      diagRows(d.checks).map(r => `<div>${r.icon} <b>${esc(r.label)}</b> — <span style="font-family:var(--font-mono);direction:ltr;unicode-bidi:isolate;">${esc(r.detail)}</span></div>`).join('');
+  } catch (e) { out.textContent = '❌ ' + e.message; }
+  finally { btn.disabled = false; }
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// §AUTH-JS + §IDLE-JS — الدخول (PIN على خطوتين) والخروج التلقائي بعد 60 دقيقة (22_login-screen.html)
+// ══════════════════════════════════════════════════════════════
+// ── Auth state — memory only, never localStorage ──────────────
+let currentEmployee  = null;  // { username, displayName } — set on login, cleared on logout
+let loginMode        = 'employee'; // employee | existing | new | confirm
+let pinDigits        = [];    // current PIN digits array (max 4)
+let pendingNewPin    = '';    // stores first PIN entry during new-user confirm flow
+let isLoginBusy      = false; // true during any async Worker call
+let autoLoginTimer   = null;  // auto-submit after 4th digit
+
+// ── Load employees list ───────────────────────────────────────
+// Shows status messages — never silent on failure
+async function loadEmployeesList() {
+  const sel    = document.getElementById('loginSelect');
+  const status = document.getElementById('loginStatus');
+  clearLoginAlert();
+  sel.innerHTML = '<option value="">اختر اسمك للمتابعة</option>';
+  sel.disabled  = true;
+
+  if (!isConfigured()) {
+    status.className   = 'login-status warn';
+    status.textContent = 'الإعدادات غير مكتملة — افتح الإعدادات أولاً.';
+    renderLoginMode('employee');
+    return;
+  }
+
+  status.className   = 'login-status info';
+  status.textContent = 'جارٍ تحميل قائمة الموظفين...';
+
+  try {
+    const data      = await apiGet('get_employees');
+    const employees = data.employees || [];
+    EMP_LIST = employees;                // اسم الموظف في صفوف السجل + فلتر الموظف
+
+    employees.forEach(e => {
+      const o = document.createElement('option');
+      o.value = e.username; o.textContent = e.display_name;
+      sel.appendChild(o);
+    });
+
+    sel.disabled       = false;
+    status.className   = employees.length ? 'login-status info' : 'login-status warn';
+    status.textContent = employees.length
+      ? ''  // 01-09-2026 (Standards #34): كانت هنا رسالة إرشاد الاختيار — بقت في placeholder القائمة نفسها، مفيش داعي لتكرارها
+      : 'لا يوجد موظفون نشطون.';
+  } catch (err) {
+    status.className   = 'login-status error';
+    status.textContent = 'تعذّر تحميل قائمة الموظفين.';
+    showLoginAlert(err.message || 'تعذّر تحميل قائمة الموظفين.');
+  }
+}
+
+// ── Employee selected ─────────────────────────────────────────
+// Calls check_employee → verifies BOTH hasPin AND isActive
+async function handleEmployeeChange() {
+  if (isLoginBusy) return;
+  clearTimeout(autoLoginTimer);
+  clearLoginAlert();
+  resetPinState();
+
+  const sel      = document.getElementById('loginSelect');
+  const username = sel.value || '';
+
+  if (!username) { renderLoginMode('employee'); return; }
+
+  renderLoginMode('employee');
+  document.getElementById('loginSub').textContent = 'جارٍ التحقق من الحساب...';
+
+  try {
+    const data = await apiGet('check_employee', { username });
+
+    if (!data.exists) {
+      showLoginAlert('المستخدم غير موجود');
+      sel.value = ''; renderLoginMode('employee'); playBeep('error'); return;
+    }
+    if (!data.isActive) {
+      // isActive check — rejects suspended accounts even with correct PIN
+      showLoginAlert('الحساب موقوف — تواصل مع المسؤول');
+      sel.value = ''; renderLoginMode('employee'); playBeep('error'); return;
+    }
+
+    renderLoginMode(data.hasPin ? 'existing' : 'new');
+  } catch (err) {
+    showLoginAlert(err.message || 'تعذّر التحقق من الحساب');
+    sel.value = ''; renderLoginMode('employee'); playBeep('error');
+  }
+}
+
+// ── Login mode state machine ──────────────────────────────────
+// 4 states: employee → existing|new → confirm
+// TWO-STEP REVEAL: in 'employee' mode both pinZone AND primaryBtn stay hidden.
+// Controls: pinZone visibility, pinLabel text, primaryBtn text, secondaryBtn visibility
+function renderLoginMode(mode) {
+  loginMode = mode;
+  const pinZone   = document.getElementById('pinZone');
+  const pinLabel  = document.getElementById('pinLabel');
+  const primary   = document.getElementById('loginPrimaryBtn');
+  const secondary = document.getElementById('loginSecondaryBtn');
+
+  pinZone.classList.toggle('visible', mode !== 'employee');
+  primary.classList.toggle('visible', mode !== 'employee');
+  secondary.classList.toggle('visible', mode === 'confirm');
+  resetPinState(false);
+  clearLoginAlert();
+
+  const sub = document.getElementById('loginSub');
+  if (mode === 'employee') {
+    sub.textContent      = '';  // 01-09-2026: كان "اختر اسمك للمتابعة" — النص ده بقى placeholder القائمة نفسها (اسمي مش subtitle منفصل)
+    pinLabel.textContent = 'أدخل الـ PIN';
+    primary.textContent  = 'دخول';
+    primary.disabled     = true;
+    return;
+  }
+  if (mode === 'existing') {
+    sub.textContent      = 'أدخل الـ PIN';
+    pinLabel.textContent = 'أدخل الـ PIN';
+    primary.textContent  = 'دخول';
+    primary.disabled     = true;
+    return;
+  }
+  if (mode === 'new') {
+    sub.textContent      = 'أول مرة؟ أنشئ PIN من 4 أرقام';
+    pinLabel.textContent = 'أنشئ PIN جديد';
+    primary.textContent  = 'متابعة';
+    primary.disabled     = true;
+    return;
+  }
+  if (mode === 'confirm') {
+    sub.textContent      = 'أعد إدخال الـ PIN للتأكيد';
+    pinLabel.textContent = 'تأكيد الـ PIN';
+    primary.textContent  = 'تأكيد وتسجيل الدخول';
+    primary.disabled     = true;
+  }
+}
+
+function restartNewPinFlow() { pendingNewPin = ''; renderLoginMode('new'); }
+
+// ── PIN keypad ────────────────────────────────────────────────
+function pressPinKey(key) {
+  if (isLoginBusy || loginMode === 'employee') return;
+  clearTimeout(autoLoginTimer);
+
+  if      (key === 'clear')                               pinDigits = [];
+  else if (key === 'back')                                pinDigits.pop();
+  else if (/^\d$/.test(key) && pinDigits.length < 4)     pinDigits.push(key);
+
+  clearLoginAlert();
+  renderPinSlots();
+  updatePrimaryLoginState();
+
+  // Auto-submit 140ms after 4th digit entered
+  if (pinDigits.length === 4) {
+    autoLoginTimer = setTimeout(() => handlePrimaryLoginAction(), 140);
+  }
+}
+
+function renderPinSlots() {
+  for (let i = 0; i < 4; i++) {
+    const slot = document.getElementById(`pinSlot${i}`);
+    slot.classList.remove('empty', 'filled', 'error');
+    slot.classList.add(i < pinDigits.length ? 'filled' : 'empty');
+  }
+}
+
+function resetPinState(clearPending = true) {
+  pinDigits = [];
+  if (clearPending && loginMode !== 'confirm') pendingNewPin = '';
+  renderPinSlots();
+  updatePrimaryLoginState();
+}
+
+function updatePrimaryLoginState() {
+  document.getElementById('loginPrimaryBtn').disabled =
+    loginMode === 'employee' || pinDigits.length !== 4 || isLoginBusy;
+}
+
+// ── Primary button action — dispatches by loginMode ──────────
+async function handlePrimaryLoginAction() {
+  if (isLoginBusy || loginMode === 'employee' || pinDigits.length !== 4) return;
+  if (loginMode === 'existing') { await verifyExistingPin();      return; }
+  if (loginMode === 'new')      { pendingNewPin = pinDigits.join(''); renderLoginMode('confirm'); return; }
+  if (loginMode === 'confirm')  { await registerNewPinAndLogin(); }
+}
+
+// ── Verify existing PIN ───────────────────────────────────────
+async function verifyExistingPin() {
+  const username = document.getElementById('loginSelect').value;
+  const pin      = pinDigits.join('');
+  setLoginBusy(true, '⏳ جاري التحقق...');
+  try {
+    const data = await apiPost('verify_employee', { username, pin });
+    if (!data.ok) { await presentLoginPinError('PIN خطأ — حاول مرة أخرى'); return; }
+    await finishLogin(username, data.displayName);
+  } catch (err) {
+    await presentLoginPinError(err.message || 'PIN خطأ');
+  } finally {
+    setLoginBusy(false);
+  }
+}
+
+// ── Register new PIN then login ───────────────────────────────
+async function registerNewPinAndLogin() {
+  const username    = document.getElementById('loginSelect').value;
+  const confirmPin  = pinDigits.join('');
+  if (confirmPin !== pendingNewPin) {
+    await presentLoginPinError('الـ PIN غير متطابق — حاول مرة أخرى');
+    pendingNewPin = ''; renderLoginMode('new'); return;
+  }
+  setLoginBusy(true, '⏳ جاري التسجيل...');
+  try {
+    const reg = await apiPost('register_pin', { username, pin: pendingNewPin });
+    if (reg && reg.ok === false) { await presentLoginPinError(reg.error || 'تعذّر تسجيل الـ PIN'); return; }
+    const data = await apiPost('verify_employee', { username, pin: pendingNewPin });
+    if (!data.ok) { await presentLoginPinError(data.error || 'تعذّر تسجيل الدخول'); return; }
+    await finishLogin(username, data.displayName);
+  } catch (err) {
+    await presentLoginPinError(err.message || 'تعذّر تسجيل الـ PIN');
+  } finally {
+    setLoginBusy(false);
+  }
+}
+
+// ── Busy state — disables keypad + select during async ops ───
+function setLoginBusy(active, text = '') {
+  isLoginBusy = active;
+  const primary = document.getElementById('loginPrimaryBtn');
+  document.querySelectorAll('#pinKeypad .pin-key').forEach(b => b.disabled = active);
+  document.getElementById('loginSelect').disabled = active || !isConfigured();
+  if (active) {
+    primary.dataset.prevText = primary.textContent;
+    primary.textContent      = text || primary.textContent;
+    primary.disabled         = true;
+  } else {
+    primary.textContent = primary.dataset.prevText || primary.textContent;
+    delete primary.dataset.prevText;
+    updatePrimaryLoginState();
+  }
+}
+
+// ── PIN error — shake + red slots + auto-reset after 760ms ───
+async function presentLoginPinError(message) {
+  playBeep('error');
+  showLoginAlert(message);
+  const slots = document.getElementById('pinSlots');
+  slots.classList.add('shake');
+  for (let i = 0; i < 4; i++) document.getElementById(`pinSlot${i}`).classList.add('error');
+  await new Promise(r => setTimeout(r, 760));
+  slots.classList.remove('shake');
+  pinDigits = []; renderPinSlots(); updatePrimaryLoginState();
+}
+
+function showLoginAlert(msg) {
+  const a = document.getElementById('loginAlert');
+  a.textContent = msg; a.classList.add('visible');
+}
+function clearLoginAlert() {
+  const a = document.getElementById('loginAlert');
+  a.textContent = ''; a.classList.remove('visible');
+}
+
+// ── Keyboard support ──────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const loginVisible  = !document.getElementById('loginOverlay').classList.contains('hidden');
+  // ⚠️ العنصر اسمه settingsOverlay — 'settingsModal' غير موجود ويرمي استثناء
+  const settingsOpen  = document.getElementById('settingsOverlay').classList.contains('open');
+  if (!loginVisible || settingsOpen || isLoginBusy) return;
+  if (/^\d$/.test(e.key))                       { e.preventDefault(); pressPinKey(e.key);  return; }
+  if (e.key === 'Backspace')                    { e.preventDefault(); pressPinKey('back'); return; }
+  if (e.key === 'Delete' || e.key === 'Escape') { e.preventDefault(); pressPinKey('clear'); return; }
+  if (e.key === 'Enter')                        { e.preventDefault(); handlePrimaryLoginAction(); }
+});
+
+// ── Finish login ──────────────────────────────────────────────
+// ⚠️ Customize: add tool-specific actions after the base behavior below
+async function finishLogin(username, displayName) {
+  currentEmployee = { username, displayName };
+  document.getElementById('loginOverlay').classList.add('hidden');
+  hideLoginNotice();
+  idleStart();                       // §IDLE-JS — يبدأ عدّاد عدم النشاط
+  showToast(`أهلاً ${displayName} 👋`, 'success');
+  playBeep('success');
+  onAfterLogin();                    // §TOOL — اسم الموظف في الهيدر + فوكس مربع البحث
+
+  // ── CUSTOMIZE: add post-login actions here ─────────────────
+  // Examples:
+  //   await loadAllEmployees();   // populate log filter dropdown
+  //   setTimeout(() => document.getElementById('scanInput')?.focus(), 100);
+  // ──────────────────────────────────────────────────────────
+}
+
+// ── Logout ────────────────────────────────────────────────────
+// ⚠️ الخروج اليدوي من غير أي تأكيد (confirm / showConfirm ممنوعين — Standards #52).
+// الضغط على اسم الموظف في الهيدر بيطلّع فورًا.
+// ⚠️ Customize: add tool-specific reset inside performLogout() (CUSTOMIZE block)
+function doLogout() {
+  // دفعة شغّالة (isUpdating / setUpdateLock) → ممنوع الخروج لحد ما تخلص. ده حارس مش تأكيد.
+  if (isIdleBlocked()) {
+    showToast('فيه دفعة بتتنفّذ دلوقتي — استنى لحد ما تخلص', 'warning');
+    return;
+  }
+  performLogout('manual');
+}
+
+// reason: 'manual' | 'idle' — نفس المسار للاتنين (وكمان لأي 401 من الـ Worker)
+function performLogout(reason) {
+  idleStop();
+
+  // Log logout event to D1
+  if (currentEmployee) {
+    apiGet('log_logout', { username: currentEmployee.username }).catch(() => {});
+  }
+
+  // Full state reset
+  currentEmployee = null;
+  loginMode       = 'employee';
+  pinDigits       = [];
+  pendingNewPin   = '';
+  isLoginBusy     = false;
+  clearTimeout(autoLoginTimer);
+
+  // Reset UI
+  const sel = document.getElementById('loginSelect');
+  sel.value = '';
+  document.getElementById('pinSlots').classList.remove('shake');
+  renderPinSlots();
+  renderLoginMode('employee');
+  clearLoginAlert();
+
+  // ── CUSTOMIZE: add tool-specific reset here ────────────────
+  // لازم تمسح أي بيانات حساسة على الشاشة (تليفونات / عناوين / مبالغ COD)،
+  // وتوقف أي timers / polling / charts، وتفضّي الجداول:
+  //   currentOrder = null;
+  //   document.getElementById('resultsBody').innerHTML = '';
+  //   clearInterval(pollTimer);
+  // ──────────────────────────────────────────────────────────
+
+  onAfterLogout();                   // §TOOL — مسح أي بيانات حساسة (أوردرات · فلوس · سجل)
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  if (reason === 'idle') showLoginNotice('تم تسجيل خروج تلقائي لعدم النشاط');
+}
+
+function showLoginNotice(msg) {
+  const el = document.getElementById('loginNotice');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+function hideLoginNotice() {
+  document.getElementById('loginNotice')?.classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════
+// §IDLE-JS — الخروج التلقائي لعدم النشاط (Standards #52)
+// القاعدة: 60 دقيقة لكل الأدوات من غير استثناء. التفاصيل: references/idle-logout.md
+// ══════════════════════════════════════════════════════════════
+const IDLE_TIMEOUT_MIN  = 60;     // ← ثابت موحّد — ممنوع تغييره لأداة بعينها
+const IDLE_WARN_SEC     = 60;     // التحذير قبل الخروج بدقيقة
+const IDLE_CHECK_MS     = 30000;  // فحص كل 30 ثانية (مقارنة وقت فعلي — مش setTimeout واحد طويل)
+const IDLE_THROTTLE_MS  = 10000;  // أقصى تكرار لتسجيل النشاط (السكانر بيبعت ضغطات متتالية)
+let   idleLastActivity  = Date.now();
+let   idleTicker        = null;
+let   idleFastTicker    = null;   // عدّ تنازلي كل ثانية طول ما البانر ظاهر
+
+// ← CUSTOMIZE: true طول ما فيه دفعة/عملية شغّالة (isUpdating / setUpdateLock)
+function isIdleBlocked() {
+  return typeof isUpdating !== 'undefined' && !!isUpdating;
+}
+
+function idleMark() {
+  const now = Date.now();
+  if (now - idleLastActivity < IDLE_THROTTLE_MS) return;
+  idleLastActivity = now;
+  idleHideWarn();
+}
+// أحداث حقيقية بس — mousemove ممنوع، والـ polling/network مابيعدّش نشاط
+['keydown', 'pointerdown', 'wheel', 'touchstart', 'scroll'].forEach(ev =>
+  document.addEventListener(ev, idleMark, { capture: true, passive: true })
+);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) idleTick(); });
+window.addEventListener('focus', idleTick);
+
+function idleStart() {
+  idleLastActivity = Date.now();
+  clearInterval(idleTicker);
+  idleTicker = setInterval(idleTick, IDLE_CHECK_MS);
+}
+function idleStop() {
+  clearInterval(idleTicker);
+  idleTicker = null;
+  idleHideWarn();
+}
+function idleStay() {                 // زرار "أنا موجود"
+  idleLastActivity = Date.now();
+  idleHideWarn();
+}
+function idleTick() {
+  if (!currentEmployee) return;
+  const limit = IDLE_TIMEOUT_MIN * 60000;
+  if (isIdleBlocked()) { idleLastActivity = Date.now(); idleHideWarn(); return; }
+  const idleMs = Date.now() - idleLastActivity;
+  if (idleMs >= limit) { performLogout('idle'); return; }
+  const remainMs = limit - idleMs;
+  if (remainMs <= IDLE_WARN_SEC * 1000) idleShowWarn(Math.ceil(remainMs / 1000));
+  else idleHideWarn();
+}
+function idleShowWarn(sec) {
+  document.getElementById('idleWarnText').textContent = `سيتم تسجيل الخروج لعدم النشاط بعد ${sec} ثانية`;
+  document.getElementById('idleWarnAsk').textContent  = `هل أنت موجود يا ${currentEmployee ? currentEmployee.displayName : ''}؟`;
+  document.getElementById('idleWarn').classList.add('visible');
+  if (!idleFastTicker) idleFastTicker = setInterval(idleTick, 1000);
+}
+function idleHideWarn() {
+  document.getElementById('idleWarn')?.classList.remove('visible');
+  clearInterval(idleFastTicker);
+  idleFastTicker = null;
+}
+
+// ── Settings button state (red/green) ─────────────────────────
+// ⚠️ الاسم لازم يفضل مطابق حرفيًا للنداء في saveSettings() و Init بتوع
+// §SHELL-JS (21_app-shell.html) — updateLoginSettingsBtn(), من غير "State".
+// كان فيه تعارض تسمية هنا (كانت الدالة مسماة updateLoginSettingsBtnState
+// والتعليق بيقول إنها بتتنادى من updateSettingsButtonsState() اللي مش
+// موجودة أصلاً في القالب التاني) — ده كان بيرمي ReferenceError وقت
+// التشغيل لأي أداة بتنسخ القالبين حرفيًا. اتصلّح 25-08-2026.
+function updateLoginSettingsBtn() {
+  const btn = document.getElementById('loginSettingsBtn');
+  if (!btn) return;
+  btn.classList.toggle('ready',   isConfigured());
+  btn.classList.toggle('missing', !isConfigured());
+}
+
+// ══════════════════════════════════════════════════════════════
+// §TOOL-STATE — حالة الأداة (في الذاكرة بس)
+// ══════════════════════════════════════════════════════════════
+const $ = (id) => document.getElementById(id);
+let opBusy = null;               // null | 'lookup' | 'pay'
+let isUpdating = false;          // 🔴 التسجيل شغّال → الخروج (اليدوي والتلقائي) موقوف + الإدخال مقفول (Standards #43)
+let currentOrder = null;         // آخر رد lookup_order ناجح { orderId, orderNumber, eligible, alreadyPaid, reasons, order }
+let EMP_LIST = [];               // [{ username, display_name }] — من get_employees (فلتر السجل + اسم الموظف في الصفوف)
+const sessionDone = new Map();   // orderId/orderNumber → { orderNumber, amount, status, at } — اللي اتسجّل في الجلسة دي
+
+const empName = (u) => { const e = EMP_LIST.find(x => x.username === u); return e ? e.display_name : (u || '—'); };
+
+// ══════════════════════════════════════════════════════════════
+// §ENTRY — التنضيف والتعرّف بالطول (unified-entry-box.md § ٢)
+// ══════════════════════════════════════════════════════════════
+const ENTRY_TYPES = { order_name: { mode: 'manual' }, order_id: { mode: 'shopify' } };
+const ENTRY_MODES = {
+  shopify: { to: 'فاتورة شوبيفاي', aria: 'مربع البحث — اسكن باركود فاتورة شوبيفاي' },
+  manual:  { to: 'رقم الأوردر',    aria: 'مربع البحث — اكتب رقم الأوردر' },
+};
+const entryEl = $('scanInput');
+let curMode = 'manual';          // الـ chip الحالي — بيتبع آخر نوع اتعرّف ومابيتثبّتش
+let startMode = 'manual';        // الـ chip وقت بداية الإدخال الحالي (عشان نكتب «تلقائي»)
+let autoMode = false;
+let missingEnterTimer = null;
+let fails = [], failSeq = 0;
+
+function normalizeEntry(raw) {
+  let s = String(raw ?? '').replace(/[‎‏‪-‮⁦-⁩ ]/g, ' ');
+  s = toWestern(s).trim();
+  const noHash = s.replace(/#/g, '').trim();
+  if (/^\d[\d\s,،;]*$/.test(noHash)) return { clean: noHash, numeric: true };
+  return { clean: s, numeric: false };
+}
+const inRange = (n, r) => n >= r.min && n <= r.max;
+function lengthReason(n) {
+  if (n > CFG.ORDER_ID.max) return `${n} خانة — غالبًا باركودين ملزوقين، اسكنهم واحد واحد`;
+  return `${n} خانة — مش طول معروف، غالبًا اتقرا ناقص`;
+}
+function classifyEntry(raw) {
+  const n = normalizeEntry(raw);
+  if (!n.clean) return { kind: 'empty' };
+  if (!n.numeric) return { kind: 'invalid', reason: 'اكتب رقم الأوردر أو اسكن باركود الفاتورة — مفيش حروف' };
+  const tokens = [...new Set(n.clean.split(/[\s,،;]+/).filter(Boolean))];
+  if (tokens.length > 1) return { kind: 'invalid', reason: `${tokens.length} أرقام — الأداة بتسجّل تحصيل أوردر واحد في المرة` };
+  const v = tokens[0], len = v.length;
+  if (inRange(len, CFG.ORDER_NAME)) {
+    const nv = String(Number(v));                      // الأصفار البادئة بتتشال (062403 ← 62403)
+    if (nv === '0') return { kind: 'invalid', reason: 'رقم الأوردر مش ممكن يبقى صفر' };
+    return { kind: 'single', type: 'order_name', value: nv };
+  }
+  if (inRange(len, CFG.ORDER_ID)) return { kind: 'single', type: 'order_id', value: v };
+  return { kind: 'invalid', reason: lengthReason(len) };
+}
+
+// ── §ENTRY-BAR — الـ chips واللون والـ pill ──
+function renderEntryBar() {
+  const c = classifyEntry(entryEl.value);
+  const detected = c.kind === 'single' ? ENTRY_TYPES[c.type].mode : null;
+  if (detected) curMode = detected;                    // الـ chip بيتبع آخر نوع اتعرّف
+  if (!entryEl.value) startMode = curMode;
+  autoMode = !!entryEl.value && curMode !== startMode;
+  $('entryBar').dataset.view = curMode;
+  document.querySelectorAll('.entry-chip').forEach(ch => {
+    const on = ch.dataset.m === curMode;
+    ch.classList.toggle('is-on', on);
+    ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+    ch.querySelectorAll('.entry-chip-auto').forEach(x => x.remove());
+    if (on && autoMode) { const t = document.createElement('span'); t.className = 'entry-chip-auto'; t.textContent = 'تلقائي'; ch.appendChild(t); }
+  });
+  entryEl.setAttribute('aria-label', ENTRY_MODES[curMode].aria);
+  const ico = curMode === 'manual' ? 'ico-kbd' : 'ico-scan';
+  let text = curMode === 'manual' ? 'كتابة الرقم يدوي' : 'سكانر';
+  if (autoMode) text = 'اتحوّل تلقائيًا إلى ' + ENTRY_MODES[curMode].to;
+  const hint = $('entryHint');
+  hint.dataset.m = curMode;
+  hint.innerHTML = `<svg viewBox="0 0 24 24"><use href="#${ico}"/></svg>${esc(text)}`;
+}
+function liveHint() {
+  clearTimeout(missingEnterTimer);
+  const w = toWestern(entryEl.value);                   // الأرقام العربي ← إنجليزي لحظيًا
+  if (w !== entryEl.value) entryEl.value = w;
+  const v = entryEl.value;
+  renderEntryBar();
+  if (!v) return;
+  const nn = normalizeEntry(v);
+  if (nn.numeric && nn.clean.replace(/\D/g, '').length >= CFG.DIGITS_WARN_MIN) {
+    missingEnterTimer = setTimeout(() => {              // تحذير بس — عمره ما بيبحث لوحده
+      if (entryEl.value !== v) return;
+      playBeep('fail');
+      showToast(`الرقم وصل (${nn.clean.length} خانة) ولسه ماتبحثش — اضغط Enter أو «بحث». لو بيتكرر مع السكانر راجع إعداد Enter فيه`, 'error');
+    }, CFG.MISSING_ENTER_MS);
+  }
+}
+
+// ── §FAILS — الفشل في الصندوق الأحمر (سطر قصير + ✕) — مش في كارت الأوردر ──
+function addFail(label, reason) {
+  label = String(label || '—');
+  if (!fails.find(f => f.label === label && f.reason === reason)) fails.unshift({ id: ++failSeq, label, reason });
+  playBeep('fail');
+  showToast(`${label} — ${reason}`, 'error');
+  renderFails();
+}
+function removeFail(id) { if (opBusy) return; fails = fails.filter(f => f.id !== id); renderFails(); entryEl.focus(); }
+function clearFails()   { if (opBusy) return; fails = []; renderFails(); entryEl.focus(); }
+function renderFails() {
+  const fb = $('opFails');
+  fb.hidden = fails.length === 0;
+  fb.innerHTML = fails.length ? (fails.length > 1
+      ? `<div class="bc-fails-head"><span>${fails.length} حاجة ما اتفتحتش</span><button class="btn-ghost btn-sm" type="button" id="opClearFails" ${opBusy ? 'disabled' : ''}>🗑 احذف الكل</button></div>` : '') +
+    fails.map(f => `
+      <div class="bc-fail-row">
+        <span aria-label="فشل">⚠️</span>
+        <span class="bc-fail-lbl">${esc(f.label)}</span>
+        <span class="bc-fail-why">— ${esc(f.reason)}</span>
+        <button class="bc-fail-x" type="button" data-fx="${f.id}" aria-label="احذف ${esc(f.label)} من الصندوق" ${opBusy ? 'disabled' : ''}>✕</button>
+      </div>`).join('') : '';
+}
+$('opFails').addEventListener('click', (e) => {
+  const x = e.target.closest('[data-fx]');
+  if (x) { removeFail(Number(x.dataset.fx)); return; }
+  if (e.target.closest('#opClearFails')) clearFails();
+});
+
+// ── §ENTRY::fire — Enter أو زرار «بحث» بس. مفيش بحث تلقائي بالتوقيت أبدًا ──
+function finishSubmit() {
+  entryEl.value = '';
+  startMode = curMode;           // الـ chip اللي اتعرّف يفضل هو الحالي — مفيش رجوع للقديم
+  renderEntryBar();
+  if (!opBusy) entryEl.focus();
+}
+function flashCard() {
+  const cardEl = document.querySelector('#orderCard .card');
+  if (cardEl) { cardEl.classList.remove('flash'); void cardEl.offsetWidth; cardEl.classList.add('flash'); }
+}
+function fireEntry() {
+  clearTimeout(missingEnterTimer);
+  if (opBusy) {
+    playBeep('fail');
+    showToast(opBusy === 'pay' ? 'جاري التسجيل — الإدخال مقفول لحد ما يخلص' : 'جاري البحث عن الأوردر — استنى لحد ما يخلص', 'error');
+    return;
+  }
+  const raw = entryEl.value;
+  const c = classifyEntry(raw);
+  if (c.kind === 'empty') return;
+  if (c.kind === 'invalid') {
+    const shown = (normalizeEntry(raw).clean || String(raw).trim()).slice(0, 40);
+    finishSubmit(); addFail(shown, c.reason); return;
+  }
+  finishSubmit();
+  const asName = c.type === 'order_name' ? '#' + c.value : null;
+  // مكرر: اتسجّل عليه تحصيل في الجلسة دي — مفيش بحث تاني (الـ Worker كمان هيرفضه)
+  const done = sessionDone.get(c.type === 'order_id' ? c.value : asName);
+  if (done) {
+    playBeep('dup');
+    showToast(`${done.orderNumber} اتسجّل عليه تحصيل في الجلسة دي خلاص`, 'dup');
+    return;
+  }
+  // مكرر: نفس الأوردر معروض قدامك — مابنعيدش البحث
+  if (currentOrder && (c.type === 'order_name' ? currentOrder.orderNumber === asName : String(currentOrder.orderId) === c.value)) {
+    playBeep('dup');
+    showToast(`${currentOrder.orderNumber} معروض قدامك بالفعل`, 'dup');
+    flashCard();
+    return;
+  }
+  lookupOrder(c.type, c.value);
+}
+// الضغط على chip = تحديد نقطة البداية (مفيش تثبيت ولا رفض) — أي إدخال بعده بيتعرّف بطوله والـ chip بيتبعه
+function selectChip(m) {
+  if (opBusy) return;
+  curMode = m; startMode = m;
+  entryEl.value = '';
+  clearTimeout(missingEnterTimer);
+  renderEntryBar();
+  entryEl.focus();
+}
+entryEl.addEventListener('input', liveHint);
+entryEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fireEntry(); } });
+$('addBtn').addEventListener('click', fireEntry);
+$('entryChips').addEventListener('click', (e) => { const c = e.target.closest('.entry-chip'); if (c) selectChip(c.dataset.m); });
+
+// ══════════════════════════════════════════════════════════════
+// §ORDER — البحث وعرض الكارت (الأهلية بتتحسب في الـ Worker والصفحة بترسم ردّه)
+// ══════════════════════════════════════════════════════════════
+const FIN_LABELS = { PENDING: 'Pending', PAID: 'Paid', PARTIALLY_PAID: 'Partially Paid', AUTHORIZED: 'Authorized', PARTIALLY_REFUNDED: 'Partially Refunded', REFUNDED: 'Refunded', VOIDED: 'Voided', EXPIRED: 'Expired' };
+
+function setBusy(v) {
+  opBusy = v;
+  isUpdating = v === 'pay';
+  entryEl.disabled = v === 'pay';
+  $('addBtn').disabled = v === 'pay';
+  renderFails();
+  refreshPayControls();
+}
+
+async function lookupOrder(type, value, opts = {}) {
+  // opts.silent = إعادة قراءة (بعد التسجيل / بعد رفض) — من غير صوت ولا توست نجاح
+  const card = $('orderCard');
+  const hadCard = card.style.display !== 'none' && card.innerHTML.trim() !== '';
+  const label = type === 'order_id' ? String(value) : '#' + value;
+  const notFoundWhy = type === 'order_id' ? 'مفيش أوردر بباركود الفاتورة ده على شوبيفاي' : 'مفيش أوردر بالرقم ده على شوبيفاي';
+  setBusy('lookup');
+  if (hadCard) card.style.opacity = '.5';
+  else { card.style.display = ''; card.innerHTML = '<div class="card"><div class="q-empty">⏳ جاري البحث عن الأوردر...</div></div>'; }
+  const dropEmptyCard = () => { if (!hadCard) { card.style.display = 'none'; card.innerHTML = ''; } };
+  try {
+    const d = await apiGet('lookup_order', { kind: type === 'order_id' ? 'id' : 'name', value });
+    if (!d.found) { dropEmptyCard(); if (!opts.silent) addFail(label, notFoundWhy); return null; }
+    // حماية: طلبنا #6239 ورجع #62398 → فشل مش عرض (بحث شوبيفاي بيرجّع تطابق جزئي — الـ Worker بيطابق حرفيًا بس نتأكد هنا كمان)
+    if (type === 'order_name' && d.orderNumber !== '#' + value) { dropEmptyCard(); addFail(label, `شوبيفاي رجّع ${d.orderNumber} — الرقم ناقص`); return null; }
+    if (type === 'order_id' && String(d.orderId) !== String(value)) { dropEmptyCard(); addFail(label, 'الـ ID اللي رجع مختلف عن المطلوب'); return null; }
+    currentOrder = d;
+    renderOrder(d);
+    if (!opts.silent) {
+      if (d.eligible) { playBeep('success'); showToast(`اتفتح ${d.orderNumber}`, 'success'); }
+      else if (d.alreadyPaid) { playBeep('dup'); showToast(`${d.orderNumber} مدفوع بالكامل`, 'dup'); }
+      else { playBeep('fail'); showToast(`${d.orderNumber} — مش مؤهل لتسجيل التحصيل`, 'error'); }
+    }
+    return d;
+  } catch (e) {
+    dropEmptyCard();
+    if (!opts.silent) addFail(label, `تعذّر الاستعلام: ${e.message}`);
+    else showToast(`تعذّر تحديث بيانات الأوردر: ${e.message}`, 'error', CFG.TOAST_MS.error);
+    return null;
+  } finally {
+    card.style.opacity = '';
+    setBusy(null);
+    if (!isUpdating) entryEl.focus();
+  }
+}
+
+function pill(k, v, cls = '') { return `<span class="pill ${cls}"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></span>`; }
+
+function renderOrder(d) {
+  const card = $('orderCard'), o = d.order || {};
+  const done = sessionDone.get(String(d.orderId));
+  const dueC = toCents(o.outstanding);
+  const items = o.lineItems || [];
+
+  const banner = done
+    ? `<div class="oc-banner ok">✅ اتسجّل التحصيل على الأوردر ده في الجلسة دي — التسجيل عليه اتقفل</div>`
+    : d.eligible
+      ? `<div class="oc-banner ok">✅ مؤهل لتسجيل التحصيل — S1 = Confirmed و S2 فاضي</div>`
+      : d.alreadyPaid
+        ? `<div class="oc-banner neutral">ℹ️ الأوردر مدفوع بالكامل — مفيش حاجة مطلوبة</div>`
+        : `<div class="oc-banner bad">⛔ مش مؤهل لتسجيل التحصيل<ul>${(d.reasons || []).map(r => `<li>• ${esc(r.text)}</li>`).join('')}</ul></div>`;
+  const preReg = o.preRegistered
+    ? `<div class="oc-banner warn">⚠️ الأوردر عليه علامة «تسجيل مسبق» — المستحق المعروض هو المتبقي على شوبيفاي بعد التسجيل المسبق. راجعه قبل التسجيل.</div>` : '';
+
+  const itemsHtml = items.length ? `
+    <table class="oc-items"><thead><tr><th>SKU</th><th>المنتج</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>
+    ${items.map(li => `<tr><td class="sku">${esc(li.sku || '—')}</td><td>${esc(li.name)}</td><td class="num">${esc(li.quantity)}</td><td class="num">${esc(fmtMoney(li.unitPrice))}</td><td class="num">${esc(fmtMoney(li.totalPrice))}</td></tr>`).join('')}
+    </tbody></table>` : '';
+
+  const payHtml = (!done && d.eligible) ? `
+    <div class="pay-sec">
+      <h3><span>💳 طرق الدفع</span><button class="btn-outline btn-sm" type="button" id="pmAllCash">كل المبلغ كاش</button></h3>
+      <div class="pm-grid">
+        ${PM.map(m => `<div class="pm-field"><label for="pm_${m.k}">${esc(m.l)}</label><input id="pm_${m.k}" data-pm="${m.k}" type="text" inputmode="decimal" autocomplete="off" dir="ltr" aria-label="${esc(m.l)}"></div>`).join('')}
+      </div>
+      <div class="pay-validation" id="payValidation"></div>
+      <div class="pay-actions">
+        <button class="btn-green pay-go" type="button" id="payBtn" disabled>💵 تسجيل التحصيل على شوبيفاي</button>
+        <span class="pay-why" id="payWhy"></span>
+      </div>
+    </div>` : '';
+  const doneHtml = done
+    ? `<div class="pay-done">✓ ${esc(done.orderNumber)} — اتسجّل ${esc(fmtMoney(done.amount))} ج (${esc(resultLabel(done.status))}). ابحث عن أوردر تاني.</div>` : '';
+
+  card.style.display = '';
+  card.innerHTML = `
+    <div class="card" data-oid="${esc(d.orderId)}">
+      <div class="oc-hdr">
+        <div class="oc-title">${orderLink(d.orderNumber, d.orderId)}</div>
+        <div class="oc-badges">
+          ${pill('S1', o.s1 || 'فاضي', o.s1 === 'Confirmed' ? 'ok' : 'bad')}
+          ${pill('S2', o.s2 || 'فاضي', o.s2 ? 'bad' : 'ok')}
+          ${pill('المالية', FIN_LABELS[o.financialStatus] || o.financialStatus || '—')}
+          ${pill('التنفيذ', o.fulfillmentStatus || '—')}
+          ${o.courier ? pill('المندوب', o.courier) : ''}
+        </div>
+      </div>
+      ${banner}${preReg}
+      <div class="oc-amounts">
+        <div class="stat due ${dueC <= 0 ? 'zero' : ''}"><div class="l">المستحق التحصيل (${esc(o.currency || 'EGP')})</div><div class="n">${esc(fmtMoney(o.outstanding))}</div></div>
+        <div class="stat"><div class="l">إجمالي الأوردر</div><div class="n">${esc(fmtMoney(o.total))}</div></div>
+        <div class="stat"><div class="l">المحصّل سابقًا</div><div class="n">${esc(fmtMoney(o.received))}</div></div>
+        <div class="stat"><div class="l">الشحن</div><div class="n">${esc(fmtMoney(o.shippingAmount))}</div></div>
+      </div>
+      ${itemsHtml}${payHtml}${doneHtml}
+    </div>`;
+  refreshPayControls();
+}
+
+// ══════════════════════════════════════════════════════════════
+// §PAY — طرق الدفع · التحقق · التأكيد · القفل · الملخّص
+// ══════════════════════════════════════════════════════════════
+function readPM() {
+  const m = {};
+  PM.forEach(x => { const el = $('pm_' + x.k); m[x.k] = el && el.value.trim() !== '' ? Number(el.value) : 0; });
+  return m;
+}
+const pmSumCents = (m) => PM.reduce((s, x) => s + (Number.isFinite(m[x.k]) ? toCents(m[x.k]) : 0), 0);
+function payState() {
+  if (!currentOrder || !currentOrder.eligible || sessionDone.has(String(currentOrder.orderId))) return { show: false };
+  const dueC = toCents(currentOrder.order.outstanding), m = readPM();
+  const bad = PM.some(x => !Number.isFinite(m[x.k]) || m[x.k] < 0);
+  const sumC = pmSumCents(m), empty = PM.every(x => !($('pm_' + x.k) && $('pm_' + x.k).value.trim()));
+  return { show: true, dueC, m, sumC, empty, bad, valid: !empty && !bad && sumC === dueC && dueC > 0 };
+}
+function refreshPayControls() {
+  const s = payState();
+  const payBtn = $('payBtn'), val = $('payValidation'), why = $('payWhy'), all = $('pmAllCash');
+  document.querySelectorAll('.pm-field input').forEach(i => { i.disabled = opBusy === 'pay'; i.classList.toggle('has-value', i.value.trim() !== ''); });
+  if (all) all.disabled = !!opBusy;
+  if (!s.show || !val) return;
+  const due = s.dueC / 100, sum = s.sumC / 100;
+  if (s.empty) { val.className = 'pay-validation'; val.textContent = `وزّع المبلغ على طرق الدفع — المجموع لازم يساوي ${fmtMoney(due)}`; }
+  else if (s.bad) { val.className = 'pay-validation mismatch'; val.textContent = 'في طريقة دفع قيمتها مش رقم صحيح'; }
+  else if (s.sumC === s.dueC) { val.className = 'pay-validation ok'; val.textContent = `✓ المجموع مظبوط — ${fmtMoney(sum)}`; }
+  else { val.className = 'pay-validation mismatch'; val.textContent = `المجموع ${fmtMoney(sum)} — ${s.sumC > s.dueC ? 'زيادة' : 'ناقص'} ${fmtMoney(Math.abs(s.sumC - s.dueC) / 100)}`; }
+  payBtn.disabled = !s.valid || !!opBusy;
+  why.textContent = opBusy ? '' : (s.valid ? '' : (s.empty ? 'أدخل طرق الدفع الأول' : 'مجموع طرق الدفع لازم يساوي المستحق'));
+}
+// تنضيف حقول المبالغ: أرقام إنجليزي · نقطة واحدة · خانتين عشريتين
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (!t.matches || !t.matches('.pm-field input')) return;
+  let v = toWestern(t.value).replace(/[^\d.]/g, '');
+  const i = v.indexOf('.');
+  if (i >= 0) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, '').slice(0, 2);
+  if (v !== t.value) t.value = v;
+  refreshPayControls();
+});
+document.addEventListener('click', (e) => {
+  if (!document.contains(e.target)) return;
+  if (e.target.closest('#pmAllCash')) {
+    if (opBusy || !currentOrder) return;
+    PM.forEach(x => { const el = $('pm_' + x.k); if (el) el.value = x.k === 'cash' ? String(Number(currentOrder.order.outstanding)) : ''; });
+    refreshPayControls(); return;
+  }
+  if (e.target.closest('#payBtn')) startPay();
+});
+
+// ── §CONFIRM — تأكيد بالأرقام قبل الفعل اللي مالوش رجعة (الإلغاء هو المتركّز) ──
+let confirmResolve = null;
+function askConfirm({ header, lead, lines, okLabel }) {
+  $('confirmHdr').textContent = header;
+  $('confirmLead').textContent = lead;
+  $('confirmLines').innerHTML = lines.map(l => `<li class="${l.cls || ''}">${l.html}</li>`).join('');
+  $('confirmOkBtn').textContent = okLabel;
+  $('confirmOverlay').classList.add('open');
+  $('confirmCancelBtn').focus();
+  return new Promise(res => { confirmResolve = res; });
+}
+function closeConfirm(ok) {
+  $('confirmOverlay').classList.remove('open');
+  if (confirmResolve) { const r = confirmResolve; confirmResolve = null; r(!!ok); }
+}
+
+// ── §SUMMARY — ملخّص إجباري بعد أي تسجيل (التوست بيختفي والنتيجة لازم تفضل) ──
+const RESULT_LABELS = { success: 'تم', warning: 'تم جزئيًا', error: 'فشل', rejected: 'مرفوض', already: 'خلاص متعمل' };   // مصدر واحد للجدول والتصدير والملخّص
+const RESULT_CLS    = { success: 'ok', warning: 'warn', error: 'err', rejected: 'err', already: 'neutral' };
+const resultLabel = (v) => RESULT_LABELS[v] || '—';                 // '—' = ما اتحاولش، وبس
+let summaryResolve = null;
+function showSummary(status, lines) {
+  const badge = $('sumBadge');
+  const titles = { success: '✓ تم التسجيل', warning: '⚠ تم جزئيًا — فيه حاجة ما اتأكدتش', error: '✗ فشل التسجيل', rejected: '⛔ التسجيل اتوقف قبل أي محاولة', already: 'ℹ️ متعمل خلاص — مفيش حاجة مطلوبة' };
+  badge.className = 'sum-badge ' + status;
+  badge.textContent = titles[status] || titles.error;
+  $('summaryLines').innerHTML = lines.map(l => `<li class="${l.cls || ''}">${l.html}</li>`).join('');
+  $('summaryOverlay').classList.add('open');
+  $('summaryOkBtn').focus();
+  return new Promise(res => { summaryResolve = res; });
+}
+function closeSummary() {
+  $('summaryOverlay').classList.remove('open');
+  if (summaryResolve) { const r = summaryResolve; summaryResolve = null; r(); }
+}
+const mono = (v) => `<span class="mono">${esc(v)}</span>`;
+function methodsText(m) { return PM.filter(x => Number(m[x.k]) > 0).map(x => `${x.l} ${fmtMoney(m[x.k])}`).join(' · ') || '—'; }
+
+async function startPay() {
+  const s = payState();
+  if (opBusy || !s.show || !s.valid || !currentEmployee) return;
+  const o = currentOrder;
+  const ok = await askConfirm({
+    header: '⚠️ تأكيد تسجيل التحصيل',
+    lead: `هتسجّل تحصيل على أوردر ${o.orderNumber}:`,
+    lines: [
+      { cls: 'good', html: `💵 المبلغ: ${mono(fmtMoney(s.dueC / 100) + ' ' + (o.order.currency || 'EGP'))} (تحصيل كامل)` },
+      { html: `💳 طرق الدفع: ${esc(methodsText(s.m))}` },
+      { html: `👤 الموظف: ${esc(currentEmployee.displayName)}` },
+      { cls: 'warn', html: '⛔ التسجيل على شوبيفاي مالوش رجوع من الأداة دي (مفيش استرداد فيها).' },
+    ],
+    okLabel: `تأكيد — سجّل ${fmtMoney(s.dueC / 100)} ج`,
+  });
+  if (!ok || !currentEmployee || currentOrder !== o) { if (currentEmployee) entryEl.focus(); return; }   // خرج/بدّل الأوردر وهو في نافذة التأكيد
+  doPay(s);
+}
+
+// ── تسجيل التحصيل — لقطة + قفل (Standards #43) · النتيجة أربع حالات (Step 3C) ──
+async function doPay(s) {
+  const o = currentOrder;                       // لقطة — مش بتتغيّر لو الموظف سكن أوردر تاني (الإدخال مقفول أصلًا)
+  const body = {
+    orderId: o.orderId, orderName: o.orderNumber,
+    amount: o.order.outstanding,                // المستحق اللي الموظف شافه — الـ Worker بيتأكد إنه لسه هو
+    employee: currentEmployee.username,
+    paymentMethods: s.m,
+  };
+  setBusy('pay');
+  let res = null, netErr = null;
+  try { res = await apiPost('record_payment', body); }
+  catch (e) { netErr = e; }
+  finally { setBusy(null); }
+
+  const lines = [];
+  let status, applied = false;
+  if (res) {
+    status = res.status || (res.success ? 'success' : 'error');
+    applied = res.success === true;
+    if (applied) {
+      lines.push({ cls: 'good', html: `💵 اتسجّل ${mono(fmtMoney(res.amount) + ' ' + (res.currency || 'EGP'))} على ${esc(o.orderNumber)}` });
+      lines.push({ html: `💳 ${esc(methodsText(s.m))}` });
+      if (res.transactionId) lines.push({ cls: 'soft', html: `transaction ${mono(res.transactionId)}` });
+      if (res.verified) lines.push({ cls: 'good', html: `✓ اتأكدنا من شوبيفاي: المتبقي ${mono(fmtMoney(res.outstandingAfter))} (${esc(FIN_LABELS[res.financialStatusAfter] || res.financialStatusAfter || '—')})` });
+    } else if (res.error) {
+      lines.push({ cls: status === 'already' ? '' : 'bad', html: esc(res.error) });
+    }
+    (res.warnings || []).forEach(w => lines.push({ cls: 'warn', html: `⚠ ${esc(w)}` }));
+    if (Array.isArray(res.reasons) && res.reasons.length && !res.error) res.reasons.forEach(r => lines.push({ cls: 'bad', html: esc(r.text) }));
+    if (res.logged === false) lines.push({ cls: 'warn', html: `⚠ العملية اتنفّذت لكن ما اتسجّلتش في السجل (${esc(res.logError || 'D1')}) — بلّغ المسؤول` });
+  } else if (netErr && netErr.status === 400) {
+    status = 'error';                           // طلب باظ — الـ Worker رفضه قبل أي حاجة
+    lines.push({ cls: 'bad', html: esc(netErr.message) });
+    lines.push({ html: 'مفيش أي حاجة اتسجّلت على شوبيفاي.' });
+  } else {
+    // انقطاع / مهلة / 5xx / رد مش مفهوم = «معرفناش» مش «فشل» (Rule 6 — مفيش نجاح من غير دليل، ولا فشل من غير دليل)
+    status = 'warning';
+    lines.push({ cls: 'warn', html: `⚠ ما قدرناش نتأكد إن التسجيل اتم أو لأ: ${esc(netErr ? netErr.message : 'رد غير مفهوم')}` });
+    lines.push({ cls: 'bad', html: '⛔ متعيدش المحاولة قبل ما تراجع تاب السجل والأوردر على شوبيفاي.' });
+    lines.push({ html: 'هنعيد قراءة الأوردر من شوبيفاي دلوقتي عشان تشوف حالته الحقيقية.' });
+  }
+
+  if (applied) {
+    sessionDone.set(String(o.orderId), { orderNumber: o.orderNumber, amount: res.amount, status, at: Date.now() });
+    sessionDone.set(o.orderNumber, sessionDone.get(String(o.orderId)));
+  }
+  playBeep(status === 'success' ? 'success' : status === 'already' ? 'dup' : 'fail');
+  logStale = true;
+  await showSummary(status, lines);
+  if (!currentEmployee) return;                  // اتعمل خروج والملخّص مفتوح — مفيش حاجة تتعرض
+
+  // إعادة قراءة بعد كل نتيجة (الشاشة تقول الحقيقة من شوبيفاي مش من اللقطة القديمة) — والصف المنفَّذ بيتنزع سلاحه
+  if (applied) renderOrder(currentOrder);        // بيقفل قسم الدفع فورًا حتى لو القراءة فشلت
+  await lookupOrder(o.orderNumber ? 'order_name' : 'order_id', o.orderNumber ? o.orderNumber.replace('#', '') : o.orderId, { silent: true });
+  entryEl.focus();
+}
+
+// 🔴 refresh/قفل التاب وسط التسجيل = الموظف يفضل مش عارف النتيجة وممكن يعيد — بنسأله قبل (رسالة المتصفح نفسه)
+window.addEventListener('beforeunload', (e) => { if (isUpdating) { e.preventDefault(); e.returnValue = ''; } });
+
+// ── Hooks الدخول والخروج (مكان الـ CUSTOMIZE في §AUTH-JS) ──
+function onAfterLogin() {
+  $('activeUserBtn').textContent = `👤 ${currentEmployee.displayName}`;
+  logStale = true;
+  setTimeout(() => entryEl.focus(), 100);
+}
+function onAfterLogout() {
+  // مسح أي بيانات حساسة على الشاشة (فلوس · أوردرات) وإيقاف أي حالة شغّالة
+  currentOrder = null; sessionDone.clear(); fails = []; opBusy = null; isUpdating = false;
+  $('orderCard').style.display = 'none'; $('orderCard').innerHTML = '';
+  entryEl.value = ''; entryEl.disabled = false; $('addBtn').disabled = false;
+  renderFails(); renderEntryBar();
+  closeConfirm(false); closeSummary();
+  $('activeUserBtn').textContent = '👤 —';
+  logReset();
+  switchMainTab('main');
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// §TBL — جدول السجل (data-table-standard.md) — فلاتر في رأس العمود · server-side بالكامل
+//   الفلترة والترتيب والصفحات من الـ Worker: «النتائج» = get_logs_count مش طول الصفحة،
+//   والتصدير بيرجّع cap/total/truncated. (Log Filter Model v2 — Step 6)
+// ══════════════════════════════════════════════════════════════
+const LOG_TYPE_LABELS = { payment: 'تسجيل تحصيل', rejected: 'متوقّف قبل التسجيل' };
+const REASON_LABELS = {
+  cancelled: 'الأوردر ملغي', s1: 'S1 ≠ Confirmed', s2: 'S2 مش فاضي', refund_due: 'مستحق استرداد', paid: 'مدفوع بالكامل',
+  cannot_mark_paid: 'شوبيفاي مانعة الدفع', amount_mismatch: 'المبلغ ≠ المستحق', recent_payment: 'تحصيل حديث على نفس الأوردر',
+  not_found: 'الأوردر مش موجود', infra: 'عطل قبل التسجيل (إعدادات / شوبيفاي)',
+};
+// مفاتيح sort = مفاتيح LOG_SORT_COLUMNS في الـ Worker حرفيًا (مفتاح مش في القايمة بيرجع للافتراضي في صمت)
+const LOG_COLS = [
+  { k: 'date',     l: 'التاريخ',    flt: 'date', sort: 'date',      dw: 130 },
+  { k: 'time',     l: 'الوقت',      sort: 'time',                   dw: 120 },
+  { k: 'employee', l: 'الموظف',     flt: 'ms',   sort: 'employee',  dw: 150 },
+  { k: 'order',    l: 'الأوردر',    flt: 'text', sort: 'orderName', dw: 120 },
+  { k: 'amount',   l: 'المبلغ',     flt: 'num',  sort: 'amount',    dw: 110 },
+  { k: 'methods',  l: 'طرق الدفع',  dw: 190 },
+  { k: 'type',     l: 'العملية',    flt: 'ms',   sort: 'type',      dw: 150 },
+  { k: 'result',   l: 'النتيجة',    flt: 'ms',   sort: 'result',    dw: 130 },
+  { k: 'notes',    l: 'التفاصيل',   dw: 330 },
+];
+const PRESETS = { today: 'اليوم', yesterday: 'أمس', last3: 'آخر 3 أيام', last7: 'آخر 7 أيام', last14: 'آخر 14 يوم', last21: 'آخر 21 يوم', last30: 'آخر 30 يوم', last60: 'آخر 60 يوم', last90: 'آخر 90 يوم', thisMonth: 'الشهر الحالي', lastMonth: 'الشهر السابق', thisYear: 'العام الحالي', lastYear: 'العام السابق' };
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const FUNNEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"/></svg>';
+const LS_COLS = 'advanced_order_payment_col_widths_v1';
+const MIN_W = 64, MAX_W = 700, INIT_CAP = 260, SOFT_MIN = 90, SEARCH_MIN = 10;
+
+const LF = { ms: { employee: new Set(), type: new Set(), result: new Set() }, tok: [], num: { from: '', to: '' }, date: { preset: '', month: '', from: '', to: '' }, sort: { key: null, dir: null } };
+let logPage = 1, logTotal = 0, logLoaded = false, logStale = true, logSeq = 0;
+const colOf = (k) => LOG_COLS.find(c => c.k === k);
+const pad2 = (n) => String(n).padStart(2, '0');
+const fmtD = (v) => { if (!v) return '—'; const p = String(v).split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : v; };
+
+function logReset() {          // الخروج: مسح بيانات السجل من الشاشة + رجوع الفلاتر للحالة المحايدة
+  Object.values(LF.ms).forEach(s => s.clear()); LF.tok = []; LF.num = { from: '', to: '' }; LF.date = { preset: '', month: '', from: '', to: '' }; LF.sort = { key: null, dir: null };
+  logPage = 1; logTotal = 0; logLoaded = false; logStale = true; logSeq++;
+  const tb = $('tb-log'); if (tb) tb.innerHTML = '';
+  const w = $('logExportWarn'); if (w) { w.hidden = true; w.innerHTML = ''; }
+  decorateLog(null); tbClosePop();
+}
+
+function initLogTable() {
+  $('cg-log').innerHTML = LOG_COLS.map(c => `<col data-c="${c.k}">`).join('');
+  $('th-log').innerHTML = '<tr>' + LOG_COLS.map(c =>
+    `<th data-col="${c.k}" ${c.flt ? `data-fk="${c.k}"` : ''}><div class="th-in">` +
+    (c.sort ? `<span class="th-label" data-sort="${c.k}">${esc(c.l)}<span class="sort-icon"></span></span>` : `<span>${esc(c.l)}</span>`) +
+    (c.flt ? `<button type="button" class="th-flt" data-flt="${c.k}" aria-label="فلتر ${esc(c.l)}">${FUNNEL}<b class="th-cnt"></b></button>` : '') +
+    `</div><span class="col-rz" data-rz="${c.k}"></span></th>`).join('') + '</tr>';
+}
+
+// ⚠️ باج المعيار القاتل: !!value مش !== null (undefined !== null بتفضل true وأيقونة الفلتر تتولّع للأبد)
+function activeCount(k) {
+  const c = colOf(k); if (!c) return 0;
+  if (c.flt === 'ms')   return LF.ms[k].size;
+  if (c.flt === 'text') return LF.tok.length;
+  if (c.flt === 'num')  return (LF.num.from !== '' || LF.num.to !== '') ? 1 : 0;
+  if (c.flt === 'date') return (LF.date.from || LF.date.to) ? 1 : 0;
+  return 0;
+}
+const anyActive = () => LOG_COLS.some(c => activeCount(c.k) > 0);
+
+function msItems(k) {
+  if (k === 'employee') return EMP_LIST.map(e => ({ v: e.username, label: e.display_name || e.username }));
+  if (k === 'type')     return Object.entries(LOG_TYPE_LABELS).map(([v, label]) => ({ v, label }));
+  if (k === 'result')   return Object.entries(RESULT_LABELS).map(([v, label]) => ({ v, label }));
+  return [];
+}
+const labelOfMs = (k, v) => { const it = msItems(k).find(i => i.v === v); return it ? it.label : v; };
+
+function monthRange(y, m) { return [`${y}-${pad2(m)}-01`, `${y}-${pad2(m)}-${pad2(new Date(Date.UTC(y, m, 0)).getUTCDate())}`]; }
+function setPreset(p) {
+  const t = cairoDayStr(new Date()), Y = +t.slice(0, 4), M = +t.slice(5, 7); let r;
+  if (p === 'today') r = [t, t];
+  else if (p === 'yesterday') { const y = addDays(t, -1); r = [y, y]; }
+  else if (/^last\d+$/.test(p)) r = [addDays(t, -(+p.slice(4) - 1)), t];
+  else if (p === 'thisMonth') r = monthRange(Y, M);
+  else if (p === 'lastMonth') r = M === 1 ? monthRange(Y - 1, 12) : monthRange(Y, M - 1);
+  else if (p === 'thisYear') r = [`${Y}-01-01`, `${Y}-12-31`];
+  else r = [`${Y - 1}-01-01`, `${Y - 1}-12-31`];
+  LF.date = { preset: p, month: '', from: r[0], to: r[1] };
+}
+function setMonth(v) {          // «شهر محدد» = الشهر التقويمي كامل · «عام محدد» = السنة كاملة
+  if (/^\d{4}-\d{2}$/.test(v)) { const r = monthRange(+v.slice(0, 4), +v.slice(5, 7)); LF.date = { preset: '', month: v, from: r[0], to: r[1] }; }
+  else if (/^\d{4}$/.test(v)) LF.date = { preset: '', month: v, from: `${v}-01-01`, to: `${v}-12-31` };
+  else LF.date = { preset: '', month: '', from: '', to: '' };
+}
+const dateLabel = (d) => d.preset ? PRESETS[d.preset] : d.month ? (d.month.length === 4 ? `عام ${d.month}` : `${MONTHS_AR[+d.month.slice(5) - 1]} ${d.month.slice(0, 4)}`) : `من 📅 ${fmtD(d.from)} إلى 📅 ${fmtD(d.to)}`;
+const numLabel = () => `من ${LF.num.from !== '' ? fmtMoney(LF.num.from) : '—'} إلى ${LF.num.to !== '' ? fmtMoney(LF.num.to) : '—'}`;
+
+// الرسم المشترك: chips (سطر لكل فلتر، اسم الفلتر مرة واحدة) + حالات الأيقونات + العدّاد
+function decorateLog(count) {
+  const rows = [];
+  const chip = (t, rm) => `<span class="ms-chip">${esc(t)}<button type="button" data-rm="${esc(rm)}" aria-label="شيل الفلتر">✕</button></span>`;
+  const row = (label, chips) => `<div class="ms-chips-row"><span class="chips-label">${esc(label)}:</span>${chips.join('')}</div>`;
+  LOG_COLS.forEach(c => {
+    if (c.flt === 'ms' && LF.ms[c.k].size) rows.push(row(c.l, [...LF.ms[c.k]].map(v => chip(labelOfMs(c.k, v), `ms:${c.k}:${v}`))));
+    if (c.flt === 'text' && LF.tok.length) rows.push(row(c.l, LF.tok.map(t => chip('#' + t, `tok::${t}`))));
+    if (c.flt === 'num' && activeCount('amount')) rows.push(row(c.l, [chip(numLabel(), 'num::')]));
+    if (c.flt === 'date' && activeCount('date')) rows.push(row(c.l, [chip(dateLabel(LF.date), 'date::')]));
+  });
+  $('chips-log').innerHTML = rows.join('');
+  $('logClearAll').classList.toggle('inactive', !anyActive());
+  const head = $('th-log');
+  head.querySelectorAll('th[data-fk]').forEach(th => {
+    const n = activeCount(th.dataset.fk);
+    th.classList.toggle('flt-on', n > 0);
+    const b = th.querySelector('.th-cnt'); if (b) b.textContent = n > 1 ? n : (n ? '●' : '');
+  });
+  head.querySelectorAll('th[data-col]').forEach(th => {
+    const col = colOf(th.dataset.col), act = col && col.sort && LF.sort.key === th.dataset.col;
+    th.classList.toggle('sorted', !!act);
+    const si = th.querySelector('.sort-icon');
+    if (si) { si.textContent = act ? (LF.sort.dir === 'asc' ? '▲' : '▼') : ''; si.classList.toggle('active', !!act); }
+  });
+  if (count !== undefined) $('cnt-log').textContent = count === null ? '—' : count.toLocaleString('en-US');
+}
+function logChanged() { decorateLog(); logPage = 1; clearExportWarn(); fetchLog(); }
+
+function toggleSort(k) {
+  const s = LF.sort;
+  if (s.key !== k) LF.sort = { key: k, dir: 'asc' };
+  else if (s.dir === 'asc') s.dir = 'desc';
+  else LF.sort = { key: null, dir: null };          // الضغطة التالتة = بلا ترتيب (الافتراضي: الأحدث فوق)
+  logChanged();
+}
+function clearAllFilters() {
+  Object.values(LF.ms).forEach(s => s.clear()); LF.tok = []; LF.num = { from: '', to: '' }; LF.date = { preset: '', month: '', from: '', to: '' };
+  tbClosePop(); logChanged();
+}
+
+// ── القائمة العائمة (position:fixed على body — z 200) ──
+let tbPop = null, tbPopK = null, tbPopAnchor = null, tbPopQ = '', tbPopYear = 0, numT = null;
+function tbClosePop() { if (tbPop) tbPop.remove(); tbPop = null; tbPopK = null; tbPopAnchor = null; tbPopQ = ''; }
+function tbOpenPop(k, anchor) {
+  tbHideTip();
+  if (tbPopK === k && tbPopAnchor === anchor) { tbClosePop(); return; }
+  tbClosePop(); tbPopK = k; tbPopAnchor = anchor;
+  tbPop = document.createElement('div'); tbPop.className = 'pop'; document.body.appendChild(tbPop);
+  if (k === 'date') tbPopYear = LF.date.month ? +LF.date.month.slice(0, 4) : +cairoDayStr(new Date()).slice(0, 4);
+  tbBuildPop(); tbPlace();
+  const f = tbPop.querySelector('[data-autofocus]'); if (f) f.focus();
+}
+function tbPlace() {
+  if (!tbPop || !tbPopAnchor) return;
+  if (!document.contains(tbPopAnchor)) { tbClosePop(); return; }
+  const r = tbPopAnchor.getBoundingClientRect(), w = tbPop.offsetWidth, h = tbPop.offsetHeight;
+  const left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8));
+  let top = r.bottom + 6; if (top + h > innerHeight - 8) top = Math.max(8, r.top - h - 6);
+  tbPop.style.left = left + 'px'; tbPop.style.top = top + 'px';
+}
+function tbListHtml(k) {
+  const q = tbPopQ.trim().toLowerCase(), sel = LF.ms[k];
+  const its = msItems(k).filter(i => !q || String(i.label).toLowerCase().includes(q));
+  return its.map(i => `<div class="ms-item ${sel.has(i.v) ? 'on' : ''}" data-ms="${esc(i.v)}"><span class="cb"></span><span>${esc(i.label)}</span></div>`).join('') || '<div class="empty" style="padding:14px">لا نتائج</div>';
+}
+function tbBuildPop() {
+  const k = tbPopK, c = colOf(k); let h = '';
+  const dtInp = (attrs) => `<input type="date" class="inp" ${attrs} onclick="try{this.showPicker&&this.showPicker()}catch(e){}">`;
+  if (c.flt === 'ms') {
+    h = `<div class="pop-hd">${esc(c.l)}</div><div class="ms-ftr-top"><button type="button" class="clear-btn" data-act="clear">✕ مسح الاختيار</button><button type="button" class="lnk" data-act="all">تحديد الكل</button></div>`
+      + (msItems(k).length >= SEARCH_MIN ? '<div class="pop-srch"><input class="inp" data-msq autocomplete="off" aria-label="بحث في القايمة" data-autofocus></div>' : '')
+      + `<div class="ms-list">${tbListHtml(k)}</div>`;
+  } else if (c.flt === 'text') {
+    h = `<div class="pop-hd has-act"><span>${esc(c.l)}</span><button type="button" class="clear-btn" data-act="tokclear">✕ مسح الاختيار</button></div>`
+      + `<div class="pop-body"><div class="search-wrap"><input class="inp" data-tok autocomplete="off" inputmode="numeric" aria-label="رقم أوردر — Enter للإضافة" data-autofocus><span class="search-icon">🔍</span></div>`
+      + `<div class="tok-row">${LF.tok.map((t, i) => `<span class="ms-chip">#${esc(t)}<button type="button" data-tokrm="${i}" aria-label="إزالة">✕</button></span>`).join('')}</div>`
+      + `<div class="hint">اكتب رقم الأوردر واضغط Enter — كل رقم شرط (أو). مطابقة تامة على الرقم.</div></div>`;
+  } else if (c.flt === 'num') {
+    h = `<div class="pop-hd has-act"><span>${esc(c.l)}</span><button type="button" class="clear-btn" data-act="nclear">✕ مسح الاختيار</button></div>`
+      + `<div class="pop-body"><div class="sec"><div class="sec-t">نطاق (من — إلى)</div><div class="rng"><div><label for="nf">من</label><input id="nf" class="inp" data-n="from" inputmode="decimal" dir="ltr" value="${esc(LF.num.from)}" data-autofocus></div><div><label for="nt">إلى</label><input id="nt" class="inp" data-n="to" inputmode="decimal" dir="ltr" value="${esc(LF.num.to)}"></div></div><div class="num-warn" id="numWarn"></div></div>`
+      + `<div class="hint">الصفوف اللي من غير مبلغ (مرفوض · فشل) بتطلع برّه النطاق.</div></div>`;
+  } else if (c.flt === 'date') {
+    const d = LF.date, cy = +cairoDayStr(new Date()).slice(0, 4);
+    const pb = (p) => `<button type="button" data-preset="${p}" class="${d.preset === p ? 'on' : ''}">${PRESETS[p]}</button>`;
+    const mb = (n, i) => { const v = `${tbPopYear}-${pad2(i + 1)}`; return `<button type="button" data-mon="${v}" class="${d.month === v ? 'on' : ''}">${n}</button>`; };
+    h = `<div class="pop-hd has-act"><span>${esc(c.l)}</span><button type="button" class="clear-btn" data-act="dclear">✕ مسح الاختيار</button></div><div class="pop-body">`
+      + `<div class="sec"><div class="pills c3">${['today', 'yesterday', 'last3', 'last7', 'last14', 'last21', 'last30', 'last60', 'last90'].map(pb).join('')}</div></div>`
+      + `<div class="sec"><div class="pills c4">${['thisMonth', 'lastMonth', 'thisYear', 'lastYear'].map(pb).join('')}</div></div>`
+      + `<div class="sec"><div class="yr-step"><button type="button" data-yr="-1" aria-label="السنة السابقة" ${tbPopYear <= cy - 10 ? 'disabled' : ''}>›</button><button type="button" class="yr-lbl ${d.month === String(tbPopYear) ? 'on' : ''}" data-yrsel aria-label="العام كله">${tbPopYear}</button><button type="button" data-yr="1" aria-label="السنة التالية" ${tbPopYear >= cy ? 'disabled' : ''}>‹</button></div><div class="pills c6">${MONTHS_AR.map(mb).join('')}</div></div>`
+      + `<div class="sec"><div class="rng"><div><label for="df">من تاريخ</label>${dtInp(`id="df" data-d="from" value="${esc(d.from)}"`)}</div><div><label for="dt">إلى تاريخ</label>${dtInp(`id="dt" data-d="to" value="${esc(d.to)}"`)}</div></div></div></div>`;
+  }
+  tbPop.innerHTML = h; tbPop.classList.toggle('wide', c.flt === 'date');
+}
+function tbRenderList() { const l = tbPop && tbPop.querySelector('.ms-list'); if (l) l.innerHTML = tbListHtml(tbPopK); }
+function addToken(raw) {
+  const v = toWestern(raw).replace(/^#/, '').trim();
+  if (!/^\d{1,15}$/.test(v)) { showToast('اكتب رقم أوردر (أرقام بس)', 'error'); return false; }
+  const nv = String(Number(v) || v);
+  if (!LF.tok.includes(nv)) LF.tok.push(nv);
+  return true;
+}
+function tbPopAction(t) {
+  const k = tbPopK, c = colOf(k);
+  const it = t.closest('.ms-item');
+  if (it) { const s = LF.ms[k], v = it.dataset.ms; s.has(v) ? s.delete(v) : s.add(v); tbRenderList(); logChanged(); return; }   // القايمة بتفضل مفتوحة بعد الاختيار
+  const pr = t.closest('[data-preset]'); if (pr) { setPreset(pr.dataset.preset); logChanged(); tbBuildPop(); return; }
+  const mo = t.closest('[data-mon]');    if (mo) { setMonth(LF.date.month === mo.dataset.mon ? '' : mo.dataset.mon); logChanged(); tbBuildPop(); return; }
+  const ys = t.closest('[data-yrsel]');  if (ys) { setMonth(LF.date.month === String(tbPopYear) ? '' : String(tbPopYear)); logChanged(); tbBuildPop(); return; }
+  const yb = t.closest('[data-yr]');     if (yb) { if (yb.disabled) return; const cy = +cairoDayStr(new Date()).slice(0, 4); tbPopYear = Math.max(cy - 10, Math.min(cy, tbPopYear + (+yb.dataset.yr))); tbBuildPop(); return; }
+  const tr = t.closest('[data-tokrm]');  if (tr) { LF.tok.splice(+tr.dataset.tokrm, 1); tbBuildPop(); logChanged(); return; }
+  const a = t.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'clear') { LF.ms[k].clear(); tbBuildPop(); logChanged(); }
+  else if (act === 'all') { const s = LF.ms[k], q = tbPopQ.trim().toLowerCase(); msItems(k).filter(i => !q || String(i.label).toLowerCase().includes(q)).forEach(i => s.add(i.v)); tbRenderList(); logChanged(); }
+  else if (act === 'tokclear') { LF.tok = []; tbBuildPop(); logChanged(); }
+  else if (act === 'nclear') { LF.num = { from: '', to: '' }; tbBuildPop(); logChanged(); }
+  else if (act === 'dclear') { LF.date = { preset: '', month: '', from: '', to: '' }; tbBuildPop(); logChanged(); }
+}
+
+// ── الأحداث: listener واحد على document + حارس المعيار #32 ──
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  if (!document.contains(t)) return;                    // 🔴 الهدف اتشال بسبب re-render → مفيش قرار قفل (من غيره القايمة بتتقفل بعد أول اختيار)
+  const trg = t.closest('[data-flt]');
+  if (trg) { e.stopPropagation(); tbOpenPop(trg.dataset.flt, trg); return; }
+  if (tbPop && tbPop.contains(t)) { tbPopAction(t); return; }
+  if (tbPop) tbClosePop();
+  const rm = t.closest('[data-rm]');
+  if (rm) {
+    const [type, key, ...rest] = rm.dataset.rm.split(':'), v = rest.join(':');
+    if (type === 'ms') LF.ms[key].delete(v); else if (type === 'tok') LF.tok = LF.tok.filter(x => x !== v);
+    else if (type === 'num') LF.num = { from: '', to: '' }; else if (type === 'date') LF.date = { preset: '', month: '', from: '', to: '' };
+    logChanged(); return;
+  }
+  if (t.closest('#logClearAll')) { e.stopPropagation(); if (anyActive()) clearAllFilters(); return; }
+  const so = t.closest('[data-sort]'); if (so) { toggleSort(so.dataset.sort); return; }
+  const bar = t.closest('#logBar');
+  if (bar && !t.closest('button,input,a')) { $('wrap-log').classList.toggle('collapsed'); $('tog-log').classList.toggle('open'); }
+});
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (!tbPop) return;
+  if (t.dataset.d) { LF.date[t.dataset.d] = t.value; LF.date.preset = ''; LF.date.month = ''; logChanged(); tbPop.querySelectorAll('[data-preset],[data-mon]').forEach(b => b.classList.remove('on')); }
+  else if (t.dataset.n) {
+    let v = toWestern(t.value).replace(/[^\d.]/g, ''); if (v !== t.value) t.value = v;
+    LF.num[t.dataset.n] = v;
+    const w = $('numWarn'); if (w) w.textContent = (LF.num.from !== '' && LF.num.to !== '' && Number(LF.num.from) > Number(LF.num.to)) ? '«من» أكبر من «إلى» — مفيش نتايج' : '';
+    decorateLog(); clearTimeout(numT); numT = setTimeout(() => { logPage = 1; clearExportWarn(); fetchLog(); }, 400);
+  }
+  else if (t.dataset.msq !== undefined) { tbPopQ = t.value; tbRenderList(); }
+});
+document.addEventListener('scroll', () => { tbPlace(); }, true);
+window.addEventListener('resize', tbPlace);
+// Enter داخل أي حقل في قائمة الفلتر = اقفل القائمة والفلتر يفضل · في حقل التوكنز = أضف توكن
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { tbClosePop(); return; }
+  if (e.key === 'Enter' && tbPop && tbPop.contains(e.target)) {
+    if (e.target.matches('input[data-tok]')) { e.preventDefault(); if (addToken(e.target.value)) { tbBuildPop(); logChanged(); const f = tbPop.querySelector('[data-tok]'); if (f) f.focus(); } return; }
+    if (e.target.matches('input[data-n],input[data-d]')) { e.preventDefault(); e.target.blur(); tbClosePop(); }
+  }
+});
+
+// ── تولتيب بقيم الفلتر المحددة — مفيش حاجة محددة = مفيش تولتيب (مخصّص، مش title native) ──
+let tbTipEl = null;
+function tbTipText(k) {
+  if (!activeCount(k)) return '';
+  const c = colOf(k);
+  if (c.flt === 'ms') return [...LF.ms[k]].map(v => labelOfMs(k, v)).join('، ');
+  if (c.flt === 'text') return LF.tok.map(t => '#' + t).join('، ');
+  if (c.flt === 'num') return numLabel();
+  return dateLabel(LF.date);
+}
+function tbHideTip() { if (tbTipEl) tbTipEl.remove(); tbTipEl = null; }
+document.addEventListener('mouseover', (e) => {
+  const b = e.target.closest && e.target.closest('.th-flt');
+  if (!b) { if (tbTipEl) tbHideTip(); return; }
+  tbHideTip();
+  const txt = tbTipText(b.dataset.flt);
+  if (!txt || tbPopAnchor === b) return;
+  tbTipEl = document.createElement('div'); tbTipEl.className = 'tip'; tbTipEl.textContent = txt; document.body.appendChild(tbTipEl);
+  const r = b.getBoundingClientRect(), w = tbTipEl.offsetWidth, h = tbTipEl.offsetHeight;
+  tbTipEl.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + 'px';
+  let top = r.bottom + 6; if (top + h > innerHeight - 8) top = Math.max(8, r.top - h - 6);
+  tbTipEl.style.top = top + 'px';
+});
+document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) tbHideTip(); });
+document.addEventListener('scroll', tbHideTip, true);
+
+// ══ التحكم اللايف في عرض الأعمدة (§ 9ب) — «كل الأعمدة متماثلة بالتناسب» (v8.6.0) ══
+//   W = العرض المفضّل لكل عمود · E = الفعلي (بيتحسب من مساحة الكارت): أصغر من المساحة ← كلهم بيتمدّدوا بالتناسب
+//   (مفيش عمود بيمتص الفراغ لوحده) · أكبر ← بيتقلّصوا على مرحلتين (SOFT_MIN ثم MIN_W) · مش هيتّسع ← مفضّل + سكرول أفقي.
+const W = {}; let wReady = false, drag = null, wBadge = null, wRaf = 0;
+const tbl = () => $('tbl-log');
+const availW = () => { const sc = document.querySelector('#wrap-log .tbl-scroll'); return sc ? sc.clientWidth : 0; };
+function saveW() { lsSet(LS_COLS, JSON.stringify(W)); }
+function loadW() {
+  try { const s = JSON.parse(lsGet(LS_COLS) || 'null'); return s && LOG_COLS.every(c => typeof s[c.k] === 'number' && s[c.k] >= MIN_W && s[c.k] <= MAX_W) ? s : null; }
+  catch (e) { return null; }
+}
+function effective(avail, pinKey) {
+  const free = !!(drag && drag.free);
+  const pin = pinKey !== undefined ? pinKey : ((drag && !drag.free) ? drag.k : null);
+  const sumOf = (o) => LOG_COLS.reduce((a, c) => a + o[c.k], 0);
+  const E = {}; LOG_COLS.forEach(c => { E[c.k] = W[c.k]; });
+  const S = sumOf(E);
+  if (S > avail && !free) {
+    for (const lim of [SOFT_MIN, MIN_W]) {
+      const need = sumOf(E) - avail; if (need <= 0) break;
+      let ex = 0; LOG_COLS.forEach(c => { if (c.k !== pin) ex += E[c.k] - Math.min(E[c.k], lim); });
+      if (ex <= 0) continue;
+      const r = Math.min(1, need / ex);
+      LOG_COLS.forEach(c => { if (c.k === pin) return; const w = E[c.k], f = Math.min(w, lim); E[c.k] = Math.max(f, Math.floor(w - (w - f) * r)); });
+    }
+    if (sumOf(E) > avail) LOG_COLS.forEach(c => { E[c.k] = W[c.k]; });
+  } else if (S < avail) {
+    const others = LOG_COLS.filter(c => c.k !== pin), target = avail - (pin ? W[pin] : 0), so = others.reduce((a, c) => a + W[c.k], 0), f = target / so;
+    others.forEach(c => { E[c.k] = Math.floor(W[c.k] * f); });
+    E[others[others.length - 1].k] += target - others.reduce((a, c) => a + E[c.k], 0);
+  }
+  return { E, sum: sumOf(E) };
+}
+function applyW() {
+  if (!wReady) return;
+  const avail = availW(); if (avail <= 0) return;
+  const { E, sum } = effective(avail);
+  document.querySelectorAll('#cg-log col').forEach(col => { col.style.width = E[col.dataset.c] + 'px'; });
+  tbl().style.width = sum + 'px';
+}
+function fitWidth(i) {
+  const t = tbl(), had = t.classList.contains('measuring'); t.classList.add('measuring');
+  let w = t.querySelectorAll('thead th')[i].querySelector('.th-in').getBoundingClientRect().width + 16;
+  t.querySelectorAll('tbody tr').forEach(tr => { const td = tr.children[i]; if (!td || td.classList.contains('empty')) return; const rg = document.createRange(); rg.selectNodeContents(td); w = Math.max(w, rg.getBoundingClientRect().width + 16); });
+  if (!had) t.classList.remove('measuring');
+  return w;
+}
+function initW() {
+  if (!availW()) return;                                 // تاب مخفي — القياس بيتأجّل لحد ما يظهر
+  const t = tbl(); let saved = loadW();
+  t.classList.add('auto', 'measuring'); t.style.width = '';
+  document.querySelectorAll('#cg-log col').forEach(c => { c.style.width = ''; });
+  const nat = {};
+  t.querySelectorAll('thead th').forEach(th => { nat[th.dataset.col] = Math.min(INIT_CAP, Math.max(MIN_W, Math.round(th.getBoundingClientRect().width))); });
+  const avail = availW();
+  if (saved && LOG_COLS.reduce((a, c) => a + saved[c.k], 0) > Math.max(2 * avail, 2000)) saved = null;   // محفوظ منفوخ → قياس جديد (من غير مسح المخزّن)
+  LOG_COLS.forEach(c => { W[c.k] = saved ? saved[c.k] : Math.max(nat[c.k], c.dw); });
+  t.classList.remove('auto', 'measuring');
+  wReady = true; applyW(); watchW();
+}
+let wWatching = false;
+function watchW() {                                      // أي تغيّر في عرض الكارت (ريسايز · سكرول ظهر/اختفى · طي/فتح) ← إعادة حساب
+  if (wWatching) return; wWatching = true;
+  const sc = document.querySelector('#wrap-log .tbl-scroll'); if (!sc) return;
+  const kick = () => { if (!wRaf) wRaf = requestAnimationFrame(() => { wRaf = 0; applyW(); }); };
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(kick).observe(sc);
+  window.addEventListener('resize', kick);
+}
+function showWBadge(txt) { if (!wBadge) { wBadge = document.createElement('div'); wBadge.className = 'w-badge'; document.body.appendChild(wBadge); } wBadge.textContent = txt; }
+function hideWBadge() { if (wBadge) wBadge.remove(); wBadge = null; }
+function bake(pin) { const { E } = effective(availW(), pin); LOG_COLS.forEach(c => { W[c.k] = E[c.k]; }); }   // المعروض فعلًا يبقى هو المفضّل
+function capFor(k) {
+  let floors = 0; LOG_COLS.forEach(c => { if (c.k !== k) floors += Math.min(W[c.k], SOFT_MIN); });
+  const room = availW() - floors;
+  return room < W[k] ? { cap: MAX_W, free: true } : { cap: Math.min(MAX_W, room), free: false };
+}
+document.addEventListener('pointerdown', (e) => {
+  const h = e.target.closest && e.target.closest('[data-rz]'); if (!h || !wReady) return;
+  if (e.button !== undefined && e.button !== 0) return;
+  e.preventDefault(); e.stopPropagation(); tbClosePop(); tbHideTip();
+  const k = h.dataset.rz, prev = Object.assign({}, W);
+  bake(null); const c = capFor(k);
+  drag = { k, prev, moved: false, x: e.clientX, w: W[k], cap: c.cap, free: c.free, sign: getComputedStyle(tbl()).direction === 'rtl' ? -1 : 1, h };
+  try { h.setPointerCapture(e.pointerId); } catch (_) {}
+  h.classList.add('active'); document.body.classList.add('col-resizing');
+  const col = document.querySelector(`#cg-log col[data-c="${k}"]`); if (col) col.classList.add('hl');
+  showWBadge(W[k] + ' px');
+});
+document.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const raw = Math.round(drag.w + drag.sign * (e.clientX - drag.x));   // RTL: السحب لليسار = توسيع
+  drag.moved = true;
+  W[drag.k] = Math.max(MIN_W, Math.min(drag.cap, raw));
+  applyW(); showWBadge(W[drag.k] + ' px' + (raw > drag.cap && !drag.free ? ' · أقصى مساحة متاحة' : ''));
+});
+function endDrag() {
+  if (!drag) return;
+  drag.h.classList.remove('active'); document.body.classList.remove('col-resizing');
+  document.querySelectorAll('#cg-log col.hl').forEach(c => c.classList.remove('hl'));
+  if (drag.moved) bake(drag.k); else Object.assign(W, drag.prev);      // سحب: المعروض فعلًا هو المحفوظ · كليك من غير سحب ما يغيّرش حاجة
+  drag = null; hideWBadge(); applyW(); saveW();
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+document.addEventListener('dblclick', (e) => {                         // دبل كليك = ضبط تلقائي على أطول محتوى
+  const h = e.target.closest && e.target.closest('[data-rz]'); if (!h || !wReady) return;
+  const k = h.dataset.rz, i = LOG_COLS.findIndex(c => c.k === k); if (i < 0) return;
+  const want = Math.max(MIN_W, Math.min(MAX_W, Math.ceil(fitWidth(i))));
+  bake(null); const c = capFor(k);
+  W[k] = Math.max(MIN_W, Math.min(c.cap, want));
+  bake(k); applyW(); saveW();
+  if (want > c.cap && !c.free) showToast('العمود وصل لأقصى مساحة متاحة في الكارت', 'neutral');
+});
+
+// ══════════════════════════════════════════════════════════════
+// §LOG-JS — جلب السجل (server-side) · الصفوف · الصفحات · التصدير
+// ══════════════════════════════════════════════════════════════
+// مصدر واحد للفلاتر — بتستخدمه التلات نداءات (get_logs · get_logs_count · get_logs_export)
+function logParams() {
+  const p = {};
+  if (LF.ms.employee.size) p.employees = [...LF.ms.employee].join(',');
+  if (LF.ms.type.size)     p.types     = [...LF.ms.type].join(',');
+  if (LF.ms.result.size)   p.results   = [...LF.ms.result].join(',');
+  if (LF.tok.length)       p.orders    = LF.tok.join(',');
+  if (LF.num.from !== '')  p.amountMin = LF.num.from;
+  if (LF.num.to !== '')    p.amountMax = LF.num.to;
+  if (LF.date.from)        p.dateFrom  = LF.date.from;
+  if (LF.date.to)          p.dateTo    = LF.date.to;
+  return p;
+}
+function clearExportWarn() { const w = $('logExportWarn'); w.hidden = true; w.innerHTML = ''; }
+
+function pmCellHtml(x) {
+  const m = x.paymentMethods; if (!m || typeof m !== 'object') return '—';
+  const parts = PM.filter(p => Number(m[p.k]) > 0).map(p => `<span class="m">${esc(p.l)} <b>${esc(fmtMoney(m[p.k]))}</b></span>`);
+  return parts.length ? `<div class="pm-cell">${parts.join('')}</div>` : '—';
+}
+function detailsOf(e, x) {
+  const parts = [];
+  if (x.error) parts.push(x.error);
+  else if (e.notes) parts.push(e.notes);
+  else if (x.transactionId) parts.push(`transaction ${x.transactionId}`);
+  const main = parts[0] ? esc(parts[0]) : '—';
+  const sub = [];
+  if (Array.isArray(x.reasons) && x.reasons.length) sub.push(x.reasons.map(r => REASON_LABELS[r] || r).join(' · '));
+  // أكواد الحالات إنجليزي — كل واحدة في isolate LTR عشان الـ bidi مايلخبطش ترتيبها وسط العربي
+  const ltr = (s) => `<span style="direction:ltr;unicode-bidi:isolate">${esc(s)}</span>`;
+  const subHtml = sub.map(s => `<span class="sub2">${esc(s)}</span>`);
+  if (x.s1 !== undefined && e.type === 'payment') subHtml.push(`<span class="sub2">${ltr('S1 ' + (x.s1 || '—'))} · ${ltr('S2 ' + (x.s2 || '—'))}</span>`);
+  return `<div class="note-cell">${main}${subHtml.join('')}</div>`;
+}
+function logRowHtml(e) {
+  const x = safeExtra(e.extra), cls = RESULT_CLS[x.result] || 'neutral';
+  return `<tr>
+    <td class="col-num">${esc(formatDate(e.timestamp))}</td>
+    <td class="col-num">${esc(formatTimeOnly(e.timestamp))}</td>
+    <td>${esc(empName(e.employee))}</td>
+    <td>${e.order_name || e.order_id ? orderLink(e.order_name || e.order_id, e.order_id) : '—'}</td>
+    <td class="col-num">${e.value_after !== null && e.value_after !== undefined ? esc(fmtMoney(e.value_after)) : '—'}</td>
+    <td>${pmCellHtml(x)}</td>
+    <td>${esc(LOG_TYPE_LABELS[e.type] || e.type || '—')}</td>
+    <td>${x.result ? `<span class="status-badge ${cls}">${esc(resultLabel(x.result))}</span>` : '—'}</td>
+    <td>${detailsOf(e, x)}</td>
+  </tr>`;                                              // صف قديم بلا extra.result بيتعرض «—» مش «✓»
+}
+
+async function fetchLog() {
+  const seq = ++logSeq, base = logParams(), s = LF.sort;
+  const sortP = s.key ? { sortBy: colOf(s.key).sort, sortDir: s.dir } : {};
+  $('logReload').disabled = true;
+  try {
+    // نفس الفلاتر بالظبط في النداءين — صفحة + عدّ
+    const [pageData, countData] = await Promise.all([
+      apiGet('get_logs', { ...base, ...sortP, limit: CFG.LOG_PAGE, offset: (logPage - 1) * CFG.LOG_PAGE }),
+      apiGet('get_logs_count', base),
+    ]);
+    if (seq !== logSeq) return;                         // رد قديم — طلب أحدث ماشي
+    logTotal = countData.total || 0;
+    const entries = pageData.entries || [];
+    $('tb-log').innerHTML = entries.length ? entries.map(logRowHtml).join('')
+      : `<tr><td colspan="${LOG_COLS.length}" class="empty">${anyActive() ? 'مفيش نتايج مطابقة للفلاتر' : 'لسه مفيش عمليات'}</td></tr>`;
+    decorateLog(logTotal);                              // «النتائج» = العدّ من السيرفر مش طول الصفحة
+    renderPagination();
+    logLoaded = true; logStale = false;
+    $('logUpd').textContent = `آخر تحديث ${formatTimeOnly(new Date().toISOString()).replace('🕐 ', '')}`;
+    if (!wReady) initW(); else applyW();                // الصفوف اتغيّرت → سكرول عمودي ممكن ظهر/اختفى
+  } catch (e) {
+    if (seq !== logSeq) return;
+    decorateLog(null);
+    $('tb-log').innerHTML = `<tr><td colspan="${LOG_COLS.length}" class="empty">تعذّر تحميل السجل: ${esc(e.message)}</td></tr>`;
+    showToast(`تعذّر تحميل السجل: ${e.message}`, 'error', CFG.TOAST_MS.error);
+  } finally { $('logReload').disabled = false; }
+}
+function renderPagination() {
+  const pages = Math.max(1, Math.ceil(logTotal / CFG.LOG_PAGE));
+  $('paginationRow').hidden = pages <= 1;
+  $('pageInfo').textContent = `صفحة ${logPage} من ${pages}`;
+  $('btnPrevPage').disabled = logPage <= 1;
+  $('btnNextPage').disabled = logPage >= pages;
+}
+$('btnPrevPage').addEventListener('click', () => { if (logPage > 1) { logPage--; fetchLog(); } });
+$('btnNextPage').addEventListener('click', () => { if (logPage < Math.ceil(logTotal / CFG.LOG_PAGE)) { logPage++; fetchLog(); } });
+$('logReload').addEventListener('click', (e) => { e.stopPropagation(); fetchLog(); });
+
+// ── التصدير: get_logs_export مش get_logs + بانر ثابت لو الملف اتقص (Standards #30) ──
+$('logExport').addEventListener('click', async (e) => {
+  e.stopPropagation(); clearExportWarn();
+  // 🔴 الحارس فوق أي نداء شبكة: ExcelJS من CDN — محجوب/شبكة واقعة = ReferenceError غير ممسوك (وبعده «جاري التجهيز» وسكوت)
+  if (typeof ExcelJS === 'undefined') { showToast('مكتبة التصدير ما اتحمّلتش — راجع الاتصال وحدّث الصفحة', 'error', 7000); return; }
+  let data;
+  try { data = await apiGet('get_logs_export', logParams()); }
+  catch (err) { showToast(`تعذّر التصدير: ${err.message}`, 'error', CFG.TOAST_MS.error); return; }
+  const entries = data.entries || [];
+  const wb = new ExcelJS.Workbook(), ws = wb.addWorksheet('السجل');
+  ws.views = [{ rightToLeft: true }];
+  ws.columns = [
+    { header: 'التاريخ', key: 'date', width: 13 }, { header: 'الوقت', key: 'time', width: 12 }, { header: 'الموظف', key: 'employee', width: 18 },
+    { header: 'الأوردر', key: 'order', width: 12 }, { header: 'العملية', key: 'type', width: 18 }, { header: 'النتيجة', key: 'result', width: 14 },
+    { header: 'المبلغ', key: 'amount', width: 12 }, { header: 'كاش', key: 'cash', width: 11 }, { header: 'إنستاباي', key: 'instapay', width: 11 }, { header: 'محفظة', key: 'wallet', width: 11 },
+    { header: 'S1', key: 's1', width: 14 }, { header: 'S2', key: 's2', width: 14 },
+    { header: 'المستحق قبل', key: 'before', width: 12 }, { header: 'المستحق بعد', key: 'after', width: 12 },
+    { header: 'transaction', key: 'tx', width: 14 }, { header: 'التفاصيل', key: 'notes', width: 50 }, { header: 'ملاحظة النتيجة', key: 'resNote', width: 40 },
+  ];
+  entries.forEach(en => {
+    const x = safeExtra(en.extra), m = x.paymentMethods || {};
+    ws.addRow({
+      date: formatDateForExport(en.timestamp), time: formatTimeForExport(en.timestamp), employee: empName(en.employee), order: en.order_name || en.order_id || '',
+      type: LOG_TYPE_LABELS[en.type] || en.type || '', result: x.result ? resultLabel(x.result) : '',
+      amount: en.value_after ?? '', cash: m.cash ?? '', instapay: m.instapay ?? '', wallet: m.wallet ?? '',
+      s1: x.s1 ?? '', s2: x.s2 ?? '', before: x.outstandingBefore ?? '', after: x.outstandingAfter ?? '', tx: x.transactionId ?? '',
+      notes: en.notes || '', resNote: x.error || (Array.isArray(x.warnings) ? x.warnings.join(' | ') : '') || (Array.isArray(x.reasons) ? x.reasons.map(r => REASON_LABELS[r] || r).join(' · ') : ''),
+    });
+  });
+  const buf = await wb.xlsx.writeBuffer();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([buf], { type: 'application/octet-stream' }));
+  a.download = `advanced-order-payment-log-${cairoDayStr(new Date())}.xlsx`;   // اليوم بتوقيت القاهرة مش UTC
+  a.click();
+  const truncated = data.truncated === true || (data.cap && entries.length >= data.cap);
+  if (truncated) {
+    const w = $('logExportWarn');
+    w.innerHTML = `⚠️ <b>التصدير اتقص</b> — الملف فيه ${entries.length.toLocaleString('en-US')} صف` + (data.total != null ? ` من أصل <b>${Number(data.total).toLocaleString('en-US')}</b> مطابقين للفلاتر` : '') + '. ضيّق الفترة أو الفلاتر وصدّر على دفعات.';
+    w.hidden = false;
+    showToast(`⚠️ التصدير اتقص عند ${entries.length.toLocaleString('en-US')} صف — الملف مش كامل`, 'error', 7000);
+  } else showToast(`تم تصدير ${entries.length.toLocaleString('en-US')} عملية ✓`, 'success');
+});
+
+// ══════════════════════════════════════════════════════════════
+// §TABS — التابات · Freeze on Scroll · chip التاب الحالي (tabs-and-modals.md § 1b)
+// ══════════════════════════════════════════════════════════════
+const TAB_IDS = ['main', 'log'];
+const TAB_BTN = { main: 'tabMain', log: 'tabLog' };
+let currentTab = 'main';
+function switchMainTab(tab) {
+  currentTab = tab;
+  $('tabMain').classList.toggle('active', tab === 'main');
+  $('tabLog').classList.toggle('active', tab === 'log');
+  $('panelMain').classList.toggle('active', tab === 'main');
+  $('panelLog').classList.toggle('active', tab === 'log');
+  tbClosePop(); tbHideTip();
+  if (tab === 'log' && currentEmployee) {                // lazy load — ومفيش نداء قبل الدخول (apiGet بيفتح الإعدادات لو مفيش سر)
+    if (!logLoaded || logStale) fetchLog();
+    if (!wReady) initW(); else applyW();
+  }
+  updateTabChip(); closeTabChipMenu();
+  if (tab === 'main' && currentEmployee) entryEl.focus();
+}
+const stickyWrap = $('stickyWrap');
+const STICK_OFF = 12;            // تحت الرقم ده يترجع مفتوح
+let STICK_ON = 140;              // بيتحسب من الارتفاع الفعلي — القيمة دي مبدئية آمنة بس
+let stickyDelta = 0, stickyW = 0, stickyRafPending = false;
+// بيقيس كام بكسل ارتفاع الهيدر بيقلّ لما يتقفل — القياس ده هو اللي بيحدد عرض الـ hysteresis (scroll anchoring)
+function measureSticky() {
+  const wasStuck = stickyWrap.classList.contains('stuck');
+  const nodes = [stickyWrap, ...stickyWrap.querySelectorAll('*')];
+  const prev = nodes.map(n => n.style.transition);
+  nodes.forEach(n => { n.style.transition = 'none'; });
+  stickyWrap.classList.remove('stuck'); const open = stickyWrap.offsetHeight;
+  stickyWrap.classList.add('stuck');    const shut = stickyWrap.offsetHeight;
+  stickyWrap.classList.toggle('stuck', wasStuck);
+  stickyWrap.offsetHeight;
+  nodes.forEach((n, i) => { n.style.transition = prev[i]; });
+  stickyDelta = Math.max(0, open - shut);
+  STICK_ON = Math.max(40, stickyDelta + STICK_OFF + 24);  // الباند أوسع من الارتداد
+  stickyW = window.innerWidth;
+}
+function onPageScroll() {
+  if (stickyRafPending) return;
+  stickyRafPending = true;
+  requestAnimationFrame(() => {
+    stickyRafPending = false;
+    const y = window.scrollY, isStuck = stickyWrap.classList.contains('stuck');
+    if (!isStuck && y > STICK_ON) stickyWrap.classList.add('stuck');
+    else if (isStuck && y < STICK_OFF) stickyWrap.classList.remove('stuck');
+  });
+}
+window.addEventListener('scroll', onPageScroll, { passive: true });
+let stickyResizeTimer;
+window.addEventListener('resize', () => {
+  if (window.innerWidth === stickyW) return;             // إعادة القياس على تغيّر العرض بس
+  clearTimeout(stickyResizeTimer); stickyResizeTimer = setTimeout(measureSticky, 150);
+});
+function updateTabChip() {
+  $('activeTabChipLabel').textContent = $(TAB_BTN[currentTab]).textContent.trim();
+  document.querySelectorAll('#tabChipMenu .tab-chip-item').forEach(el => el.classList.toggle('active', el.dataset.tab === currentTab));
+}
+function buildTabChipMenu() {
+  $('tabChipMenu').innerHTML = TAB_IDS.map(id =>
+    `<div class="tab-chip-item ${id === currentTab ? 'active' : ''}" data-tab="${id}" onclick="event.stopPropagation(); switchMainTab('${id}');">${esc($(TAB_BTN[id]).textContent.trim())}</div>`).join('');
+}
+function toggleTabChipMenu(e) {
+  e.stopPropagation();
+  const menu = $('tabChipMenu'), open = !menu.classList.contains('open');
+  menu.classList.toggle('open', open); $('activeTabChip').classList.toggle('open', open);
+}
+function closeTabChipMenu() {
+  $('tabChipMenu')?.classList.remove('open');
+  $('activeTabChip')?.classList.remove('open');
+}
+document.addEventListener('click', (e) => { const chip = $('activeTabChip'); if (chip && !chip.contains(e.target)) closeTabChipMenu(); });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if ($('settingsOverlay').classList.contains('open')) closeSettings();
+  $('aboutOverlay').classList.remove('open');
+  $('changelogOverlay').classList.remove('open');
+  if ($('confirmOverlay').classList.contains('open')) closeConfirm(false);
+  if ($('summaryOverlay').classList.contains('open')) closeSummary();
+});
+
+// ══════════════════════════════════════════════════════════════
+// §INIT
+// ══════════════════════════════════════════════════════════════
+renderVersionUI();
+updateSettingsBtn();
+checkWorkerVersion();
+updateLoginSettingsBtn();
+loadEmployeesList();
+initLogTable();
+decorateLog(null);
+buildTabChipMenu();
+updateTabChip();
+measureSticky();
+renderEntryBar();
+renderFails();
+
+</script>
+</body>
+</html>

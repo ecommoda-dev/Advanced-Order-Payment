@@ -1,0 +1,26 @@
+{
+  "tool": "advanced_order_payment",
+  "since": "index.js v1.0.0",
+  "types": {
+    "login": {
+      "result": null,
+      "stage": null,
+      "desc": "دخول موظف"
+    },
+    "logout": {
+      "result": null,
+      "stage": null,
+      "desc": "خروج موظف"
+    },
+    "payment": {
+      "result": ["success", "warning", "error"],
+      "stage": "write",
+      "desc": "اتبعت تسجيل تحصيل لشوبيفاي (قبل الشحن) — success: اتسجّل واتأكد · warning: اتسجّل بس التحقق ناقص أو مش متأكدين (valueAfter = null لو مش متأكدين) · error: شوبيفاي رفضت صراحةً (valueAfter = null)"
+    },
+    "rejected": {
+      "result": ["rejected", "already"],
+      "stage": ["preflight", "lookup"],
+      "desc": "التسجيل اتوقف قبل أي محاولة على شوبيفاي — أوردر مش مؤهل (S1 ≠ Confirmed · S2 مش فاضي · ملغي · مستحق استرداد) أو المبلغ ≠ المستحق أو تكرار (already = اتدفع خلاص)"
+    }
+  }
+}

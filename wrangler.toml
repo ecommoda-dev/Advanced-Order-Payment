@@ -1,0 +1,37 @@
+# advanced-order-payment-worker — EcomModa
+# ⚠️ name لازم يطابق اسم الـ Worker في داشبورد Cloudflare حرف بحرف.
+#    لو اختلفوا، الـ build مش بيفشل — بينشر Worker جديد والأصلي بيتجمّد بصمت.
+#    (الاسم = اسم الريبو Advanced-Order-Payment بالقاعدة — constants §5.1)
+
+name               = "advanced-order-payment-worker"
+main               = "index.js"
+compatibility_date = "2025-01-01"
+workers_dev        = true
+
+[observability]
+enabled = true
+
+# ─── D1 ──────────────────────────────────────────────
+# الـ binding دايمًا "DB" — أي اسم تاني والكتابة بتفشل بصمت
+[[d1_databases]]
+binding       = "DB"
+database_name = "ecommoda-dev-logs"
+database_id   = "90db62d3-bd7e-4d92-912b-10fc78eeb565"
+
+# ─── Vars (نص عادي — مش أسرار) ────────────────────────
+# بتتطبّق فعليًا مع Workers Builds. الداشبورد مش مصدر حقيقة للـ vars —
+# أي تغيير commit على الملف ده (constants §6).
+[vars]
+SHOP_DOMAIN = "6c7e1a-53.myshopify.com"
+
+# ─── مفيش KV ولا Service Binding ─────────────────────
+# الأداة دي مابتلمسش PRE_REG_KV ولا بتنده أي Worker تاني (خطأ 1042 — Step 7-ب).
+
+# ⚠️ الأسرار مبتتكتبش هنا أبدًا: WORKER_SECRET · CLIENT_ID · CLIENT_SECRET
+#    Worker → Settings → Variables and Secrets → علّم Secret
+#    وبعدها: Deployments → Version History → ⋯ → Promote version
+#
+# ⚠️ Build watch paths (عند إنشاء الـ Worker — chip لكل ملف في سطر لوحده):
+#      index.js
+#      wrangler.toml
+#    الاتنين في سطر واحد = chip واحد باسم غلط = مفيش build أبدًا بصمت.
