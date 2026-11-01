@@ -11,6 +11,7 @@ workers_dev        = true
 [observability]
 enabled = true
 
+
 # ─── D1 ──────────────────────────────────────────────
 # الـ binding دايمًا "DB" — أي اسم تاني والكتابة بتفشل بصمت
 [[d1_databases]]
